@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="seed">
+    <mantle.party.Party partyId="LINIC" partyTypeEnumId="PtyOrganization"/>
+    <mantle.party.Organization partyId="LINIC" organizationName="LINIC SRL"/>
+    <mantle.party.PartyRole partyId="LINIC" roleTypeId="OrgInternal"/>
+
+    <mantle.party.contact.ContactMech contactMechId="9000" contactMechTypeEnumId="CmtPostalAddress"/>
+    <mantle.party.contact.PostalAddress contactMechId="9000" toName="LINIC SRL"
+                                        address1="218/A" countyGeoId="RO-BH"
+                                        city="Margine" countryGeoId="ROU" postalCode="417011"/>
+    <mantle.party.contact.PartyContactMech partyId="LINIC" contactMechId="9000"
+                                           contactMechPurposeId="PostalPayment" fromDate="1265184000000"/>
+    <mantle.party.contact.PartyContactMech partyId="LINIC" contactMechId="9000"
+                                           contactMechPurposeId="PostalBilling" fromDate="1265184000000"/>
+
+    <mantle.party.contact.ContactMech contactMechId="9001" contactMechTypeEnumId="CmtEmailAddress"
+                                      infoString="sclinicsrl@gmail.com"/>
+    <mantle.party.contact.PartyContactMech partyId="LINIC" contactMechId="9001"
+                                           contactMechPurposeId="EmailBilling" fromDate="1265184000000"/>
+
+    <mantle.facility.Facility facilityId="L1" facilityTypeEnumId="FcTpWarehouse" assetAllowIssueOverQoh="Y"
+                              ownerPartyId="LINIC" facilityName="Linic Depozit">
+    </mantle.facility.Facility>
+    <mantle.facility.Facility facilityId="L2" facilityTypeEnumId="FcTpWarehouse" assetAllowIssueOverQoh="Y"
+                              ownerPartyId="LINIC" facilityName="Colibri Depozit">
+    </mantle.facility.Facility>
+</entity-facade-xml>
