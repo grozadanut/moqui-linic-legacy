@@ -1,6 +1,6 @@
 # runtime added files
 build
-lib/moqui-linic-legacy-*.jar
+lib/
 
 # IntelliJ IDEA files
 .idea/
