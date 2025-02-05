@@ -1,6 +1,6 @@
-# gradle/build files
-build/
-.gradle
+# runtime added files
+build
+lib/moqui-linic-legacy-*.jar
 
 # IntelliJ IDEA files
 .idea/
