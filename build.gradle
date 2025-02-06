@@ -54,6 +54,7 @@ dependencies {
 
     // Add moqui-linic-legacy dependencies here
     implementation fileTree('/libs')
+    implementation 'org.apache.commons:commons-csv:1.12.0'
 }
 
 // by default the Java plugin runs test on build, change to not do that (only run test if explicit task)

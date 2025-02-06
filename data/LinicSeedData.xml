@@ -18,10 +18,30 @@
     <mantle.party.contact.PartyContactMech partyId="LINIC" contactMechId="9001"
                                            contactMechPurposeId="EmailBilling" fromDate="1265184000000"/>
 
+    <mantle.party.Party partyId="L1" partyTypeEnumId="PtyOrganization" ownerPartyId="LINIC"/>
+    <mantle.party.Organization partyId="L1" organizationName="Linic"/>
+    <mantle.party.PartyRole partyId="L1" roleTypeId="OrgInternal"/>
+
+    <mantle.party.Party partyId="L2" partyTypeEnumId="PtyOrganization" ownerPartyId="LINIC"/>
+    <mantle.party.Organization partyId="L2" organizationName="Colibri"/>
+    <mantle.party.PartyRole partyId="L2" roleTypeId="OrgInternal"/>
+
     <mantle.facility.Facility facilityId="L1" facilityTypeEnumId="FcTpWarehouse" assetAllowIssueOverQoh="Y"
-                              ownerPartyId="LINIC" facilityName="Linic Depozit">
+                              ownerPartyId="L1" facilityName="Linic Depozit">
     </mantle.facility.Facility>
     <mantle.facility.Facility facilityId="L2" facilityTypeEnumId="FcTpWarehouse" assetAllowIssueOverQoh="Y"
-                              ownerPartyId="LINIC" facilityName="Colibri Depozit">
+                              ownerPartyId="L2" facilityName="Colibri Depozit">
     </mantle.facility.Facility>
+
+    <moqui.basic.Enumeration description="Pareto" enumId="PctPareto" enumTypeId="ProductCategoryType"/>
+    <mantle.product.category.ProductCategory productCategoryId="L2A" ownerPartyId="L2" productCategoryTypeEnumId="PctPareto"
+                                             categoryName="Colibri Pareto A"/>
+    <mantle.product.category.ProductCategory productCategoryId="L2B" ownerPartyId="L2" productCategoryTypeEnumId="PctPareto"
+                                             categoryName="Colibri Pareto B"/>
+    <mantle.product.category.ProductCategory productCategoryId="L2C" ownerPartyId="L2" productCategoryTypeEnumId="PctPareto"
+                                             categoryName="Colibri Pareto C"/>
+    <mantle.product.category.ProductCategory productCategoryId="L2S" ownerPartyId="L2" productCategoryTypeEnumId="PctInventoryGroup"
+                                             categoryName="Colibri Produse in stoc(S)"/>
+    <mantle.product.category.ProductCategory productCategoryId="L2K" ownerPartyId="L2" productCategoryTypeEnumId="PctInventoryGroup"
+                                             categoryName="Colibri Produse la Comanda(K)"/>
 </entity-facade-xml>

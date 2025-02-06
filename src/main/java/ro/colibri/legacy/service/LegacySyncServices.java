@@ -1,13 +1,22 @@
 package ro.colibri.legacy.service;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.moqui.context.ExecutionContext;
 import org.moqui.entity.EntityValue;
+import org.moqui.service.ServiceException;
 import ro.colibri.beans.VanzariBean;
 import ro.colibri.beans.VanzariBeanRemote;
 import ro.colibri.entities.comercial.Partner;
 import ro.colibri.entities.comercial.Product;
 import ro.colibri.util.StringUtils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 public class LegacySyncServices {
@@ -101,7 +110,7 @@ public class LegacySyncServices {
                 String lastName = nameTokens.length > 0 ? nameTokens[0] : ""; // nume de familie
                 String firstName = ""; // prenume
                 for (int i = 1; i < nameTokens.length; i++) {
-                    firstName += nameTokens[i]+" ";
+                    firstName += nameTokens[i] + " ";
                 }
 
                 final EntityValue pg = ec.getEntity().makeValue("Person");
@@ -117,6 +126,41 @@ public class LegacySyncServices {
             }
         }
 
+        return Map.of();
+    }
+
+    public static Map<String, Object> importProductStatistics(ExecutionContext ec) {
+        final DiskFileItem fileBytes = (DiskFileItem) ec.getContext().get("uploadedFile");
+        final CSVFormat.Builder csvFormatBuilder = CSVFormat.Builder.create();
+        final CSVFormat fmt = csvFormatBuilder.build();
+
+        try (BufferedReader csvReader = new BufferedReader(new InputStreamReader(fileBytes.getInputStream()))) {
+            for (final CSVRecord rec : fmt.parse(csvReader)) {
+                final String barcode = rec.get(0);
+                final String paretoCat = rec.get(4);
+
+                EntityValue productIden = ec.getEntity().find("ProductIdentification")
+                        .condition("productIdTypeEnumId", "PidtSku")
+                        .condition("idValue", barcode)
+                        .one();
+
+                if (productIden == null) {
+                    continue;
+                }
+
+                final String productId = (String) productIden.get("productId");
+
+                final EntityValue categoryMember = ec.getEntity().makeValue("ProductCategoryMember");
+                categoryMember.set("productId", productId);
+                categoryMember.set("productCategoryId", "L2" + paretoCat);
+                categoryMember.set("fromDate", Timestamp.valueOf(LocalDateTime.of(2025, 1, 1, 0, 0)));
+                categoryMember.createOrUpdate();
+            }
+        } catch (final IOException e) {
+            throw new ServiceException("Error at importProductStatistics", e);
+        }
+
+        fileBytes.delete();
         return Map.of();
     }
 }

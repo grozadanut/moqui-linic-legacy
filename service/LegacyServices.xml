@@ -28,4 +28,14 @@ along with this software (see the LICENSE.md file). If not, see
             Synchronizes partners from the legacy database
         </description>
     </service>
+
+    <service verb="legacyImport" noun="ProductPareto" type="java"
+             location="ro.colibri.legacy.service.LegacySyncServices" method="importProductStatistics">
+        <description>
+            Import product Pareto category for L2
+        </description>
+        <in-parameters>
+            <parameter name="uploadedFile" type="org.apache.commons.fileupload.disk.DiskFileItem" required="true"/>
+        </in-parameters>
+    </service>
 </services>
