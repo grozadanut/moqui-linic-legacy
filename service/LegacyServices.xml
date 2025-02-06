@@ -21,4 +21,11 @@ along with this software (see the LICENSE.md file). If not, see
             Synchronizes all ACTIVE products(no images) from the legacy database to the Moqui database. No stock, just initial data.
         </description>
     </service>
+
+    <service verb="legacySync" noun="Partners" type="java"
+             location="ro.colibri.legacy.service.LegacySyncServices" method="syncPartners">
+        <description>
+            Synchronizes partners from the legacy database
+        </description>
+    </service>
 </services>

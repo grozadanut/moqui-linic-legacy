@@ -4,7 +4,9 @@ import org.moqui.context.ExecutionContext;
 import org.moqui.entity.EntityValue;
 import ro.colibri.beans.VanzariBean;
 import ro.colibri.beans.VanzariBeanRemote;
+import ro.colibri.entities.comercial.Partner;
 import ro.colibri.entities.comercial.Product;
+import ro.colibri.util.StringUtils;
 
 import java.util.Map;
 
@@ -80,5 +82,41 @@ public class LegacySyncServices {
             default:
                 throw new IllegalArgumentException("Unexpected value: " + uom);
         }
+    }
+
+    public static Map<String, Object> syncPartners(ExecutionContext ec) {
+        final VanzariBeanRemote bean = ServiceLocator.getBusinessService(VanzariBean.class, VanzariBeanRemote.class);
+
+        for (final Partner legacyP : bean.allPartners()) {
+            boolean isPerson = StringUtils.isEmpty(legacyP.getCodFiscal());
+
+            final EntityValue party = ec.getEntity().makeValue("Party");
+            final String legacyId = legacyP.getId() + "";
+            party.set("partyId", legacyId);
+            party.set("partyTypeEnumId", isPerson ? "PtyPerson" : "PtyOrganization");
+            party.createOrUpdate();
+
+            if (isPerson) {
+                String[] nameTokens = legacyP.getName().split(" ");
+                String lastName = nameTokens.length > 0 ? nameTokens[0] : ""; // nume de familie
+                String firstName = ""; // prenume
+                for (int i = 1; i < nameTokens.length; i++) {
+                    firstName += nameTokens[i]+" ";
+                }
+
+                final EntityValue pg = ec.getEntity().makeValue("Person");
+                pg.set("partyId", legacyId);
+                pg.set("firstName", firstName);
+                pg.set("lastName", lastName);
+                pg.createOrUpdate();
+            } else {
+                final EntityValue pg = ec.getEntity().makeValue("Organization");
+                pg.set("partyId", legacyId);
+                pg.set("organizationName", legacyP.getName());
+                pg.createOrUpdate();
+            }
+        }
+
+        return Map.of();
     }
 }
