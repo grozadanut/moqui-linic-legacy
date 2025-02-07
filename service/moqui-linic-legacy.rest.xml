@@ -19,5 +19,9 @@ along with this software (see the LICENSE.md file). If not, see
         name="moqui-linic-legacy" displayName="moqui-linic-legacy API" version="0.0.0" description="">
 
     <!-- moqui-linic-legacy & Related Rest API -->
-
+    <resource name="products" description="Products - Finished Goods, Materials, Supplies, Equipment, etc">
+        <resource name="suppliers">
+            <method type="get"><service name="LegacyServices.find#ProductSuppliers"/></method>
+        </resource>
+    </resource>
 </resource>
