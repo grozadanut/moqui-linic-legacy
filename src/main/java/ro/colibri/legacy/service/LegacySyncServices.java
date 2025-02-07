@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -158,6 +159,86 @@ public class LegacySyncServices {
             }
         } catch (final IOException e) {
             throw new ServiceException("Error at importProductStatistics", e);
+        }
+
+        fileBytes.delete();
+        return Map.of();
+    }
+
+    public static Map<String, Object> importProductSupplier(ExecutionContext ec) {
+        final DiskFileItem fileBytes = (DiskFileItem) ec.getContext().get("uploadedFile");
+        final CSVFormat.Builder csvFormatBuilder = CSVFormat.Builder.create();
+        final CSVFormat fmt = csvFormatBuilder.build();
+
+        try (BufferedReader csvReader = new BufferedReader(new InputStreamReader(fileBytes.getInputStream()))) {
+            for (final CSVRecord rec : fmt.parse(csvReader)) {
+                final String barcode = rec.get(0);
+                final String supplierName = rec.get(5);
+
+                if (StringUtils.isEmpty(supplierName))
+                    continue;
+
+                EntityValue productIden = ec.getEntity().find("ProductIdentification")
+                        .condition("productIdTypeEnumId", "PidtSku")
+                        .condition("idValue", barcode)
+                        .useCache(true)
+                        .one();
+
+                if (productIden == null) {
+                    continue;
+                }
+
+                String supplierId;
+
+                if ("TRANSFER".equals(supplierName)) {
+                    supplierId = "L1";
+                } else {
+                    EntityValue supplier = ec.getEntity().find("Organization")
+                            .condition("organizationName", supplierName)
+                            .useCache(true)
+                            .one();
+
+                    if (supplier == null) {
+                        continue;
+//                        throw new ServiceException("Organization not found: "+supplierName);
+                        // create supplier on demand
+//                    final EntityValue party = ec.getEntity().makeValue("Party");
+//                    party.set("partyTypeEnumId", "PtyOrganization");
+//                    party.create();
+//                    supplier = ec.getEntity().makeValue("Organization");
+//                    supplier.set("partyId", party.get("partyId"));
+//                    supplier.set("organizationName", supplierName);
+//                    supplier.create();
+                    }
+
+                    supplierId = (String) supplier.get("partyId");
+                }
+
+                final EntityValue supplierRole = ec.getEntity().makeValue("PartyRole");
+                supplierRole.set("partyId", supplierId);
+                supplierRole.set("roleTypeId", "Supplier");
+                supplierRole.createOrUpdate();
+
+                final String productId = (String) productIden.get("productId");
+
+                String agreementId = MessageFormat.format("AgrSuppl_L2_{0}", supplierId);
+                final EntityValue agreement = ec.getEntity().makeValue("Agreement");
+                agreement.set("agreementId", agreementId);
+                agreement.set("agreementTypeEnumId", "AgrProduct");
+                agreement.set("organizationPartyId", "L2");
+                agreement.set("otherRoleTypeId", "Supplier");
+                agreement.set("otherPartyId", supplierId);
+                agreement.createOrUpdate();
+
+                final EntityValue agreementItem = ec.getEntity().makeValue("AgreementItem");
+                agreementItem.set("agreementId", agreementId);
+                agreementItem.set("agreementItemTypeEnumId", "AitPurchase");
+                agreementItem.set("productId", productId);
+                agreementItem.set("agreementItemSeqId", productId);
+                agreementItem.createOrUpdate();
+            }
+        } catch (final IOException e) {
+            throw new ServiceException("Error at importProductSupplier", e);
         }
 
         fileBytes.delete();

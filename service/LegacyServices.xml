@@ -38,4 +38,14 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="uploadedFile" type="org.apache.commons.fileupload.disk.DiskFileItem" required="true"/>
         </in-parameters>
     </service>
+
+    <service verb="legacyImport" noun="ProductSupplier" type="java" transaction="force-new" transaction-timeout="3600"
+             location="ro.colibri.legacy.service.LegacySyncServices" method="importProductSupplier">
+        <description>
+            Import main supplier for products for L2
+        </description>
+        <in-parameters>
+            <parameter name="uploadedFile" type="org.apache.commons.fileupload.disk.DiskFileItem" required="true"/>
+        </in-parameters>
+    </service>
 </services>
