@@ -6,7 +6,7 @@ import org.moqui.entity.EntityFind
 
 ExecutionContext ec = context.ec
 
-EntityFind ef = ec.entity.find("AgreementItem")
+EntityFind ef = ec.entity.find("AgreementItem").distinct(true)
 
 dv = ef.makeEntityDynamicView()
 dv.addMemberEntity("AI", "AgreementItem", null, null, null)
@@ -28,5 +28,5 @@ ef.condition("organizationPartyId", organizationPartyId)
 
 ef.selectFields(["productId", "supplierId", "supplierName"])
 
-productSupplierList = []
-productSupplierList.addAll(ef.list())
+resultList = []
+resultList.addAll(ef.list())
