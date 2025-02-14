@@ -24,4 +24,8 @@ along with this software (see the LICENSE.md file). If not, see
             <method type="get"><service name="LegacyServices.find#ProductSuppliers"/></method>
         </resource>
     </resource>
+
+    <resource name="suppliers" description="Get the list of current registered suppliers">
+        <method type="get"><service name="LegacyServices.get#Suppliers"/></method>
+    </resource>
 </resource>
