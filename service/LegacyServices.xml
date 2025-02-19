@@ -65,4 +65,20 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="resultList" type="List"/>
         </out-parameters>
     </service>
+
+    <service verb="set" noun="ProductSuppliers" type="script"
+             location="classpath://ro/colibri/legacy/service/setProductSuppliers.groovy">
+        <in-parameters>
+            <parameter name="items" type="List">
+                <parameter name="item" type="Map">
+                    <parameter name="organizationPartyId" required="true"/>
+                    <parameter name="productId" required="true"/>
+                    <parameter name="supplierId" required="true"/>
+                </parameter>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="resultList" type="List"/>
+        </out-parameters>
+    </service>
 </services>
