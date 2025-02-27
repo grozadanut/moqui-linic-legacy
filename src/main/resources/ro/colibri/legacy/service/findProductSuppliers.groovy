@@ -12,6 +12,7 @@ dv = ef.makeEntityDynamicView()
 dv.addMemberEntity("AI", "AgreementItem", null, null, null)
 dv.addMemberEntity("AGR", "Agreement", "AI", null, ["agreementId":null])
 dv.addMemberEntity("ORG", "Organization", "AGR", null, ["otherPartyId":"partyId"])
+dv.addMemberEntity("P", "Product", "AI", null, ["productId":null])
 dv.addAlias("AI", "agreementItemTypeEnumId")
 dv.addAlias("AI", "productId")
 dv.addAlias("AGR", "agreementTypeEnumId")
@@ -19,12 +20,16 @@ dv.addAlias("AGR", "otherRoleTypeId")
 dv.addAlias("AGR", "organizationPartyId")
 dv.addAlias("AGR", "supplierId", "otherPartyId", null)
 dv.addAlias("ORG", "supplierName", "organizationName", null)
+dv.addAlias("P", "requireInventory")
 
 ef.condition("agreementItemTypeEnumId", "AitPurchase")
 ef.condition("productId", EntityCondition.IS_NOT_NULL, null)
 ef.condition("agreementTypeEnumId", "AgrProduct")
 ef.condition("otherRoleTypeId", "Supplier")
 ef.condition("organizationPartyId", organizationPartyId)
+reqinvCondList = [ec.entity.conditionFactory.makeCondition("requireInventory", EntityCondition.EQUALS, null),
+              ec.entity.conditionFactory.makeCondition("requireInventory", EntityCondition.EQUALS, "Y")]
+ef.condition(ec.entity.conditionFactory.makeCondition(reqinvCondList, EntityCondition.OR))
 
 ef.selectFields(["productId", "supplierId", "supplierName"])
 
