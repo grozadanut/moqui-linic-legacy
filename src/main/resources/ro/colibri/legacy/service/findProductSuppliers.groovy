@@ -13,6 +13,8 @@ dv.addMemberEntity("AI", "AgreementItem", null, null, null)
 dv.addMemberEntity("AGR", "Agreement", "AI", null, ["agreementId":null])
 dv.addMemberEntity("ORG", "Organization", "AGR", null, ["otherPartyId":"partyId"])
 dv.addMemberEntity("P", "Product", "AI", null, ["productId":null])
+dv.addMemberEntity("PCM", "ProductCategoryMember", "P", true, ["productId":null])
+dv.addMemberEntity("PC", "ProductCategory", "PCM", true, ["productCategoryId":null])
 dv.addAlias("AI", "agreementItemTypeEnumId")
 dv.addAlias("AI", "productId")
 dv.addAlias("AGR", "agreementTypeEnumId")
@@ -21,6 +23,9 @@ dv.addAlias("AGR", "organizationPartyId")
 dv.addAlias("AGR", "supplierId", "otherPartyId", null)
 dv.addAlias("ORG", "supplierName", "organizationName", null)
 dv.addAlias("P", "requireInventory")
+dv.addAlias("PC", "ownerPartyId")
+dv.addAlias("PC", "productCategoryTypeEnumId")
+dv.addAlias("PCM", "pareto", "productCategoryId", null)
 
 ef.condition("agreementItemTypeEnumId", "AitPurchase")
 ef.condition("productId", EntityCondition.IS_NOT_NULL, null)
@@ -31,7 +36,13 @@ reqinvCondList = [ec.entity.conditionFactory.makeCondition("requireInventory", E
               ec.entity.conditionFactory.makeCondition("requireInventory", EntityCondition.EQUALS, "Y")]
 ef.condition(ec.entity.conditionFactory.makeCondition(reqinvCondList, EntityCondition.OR))
 
-ef.selectFields(["productId", "supplierId", "supplierName"])
+paretoFindCondList = [ec.entity.conditionFactory.makeCondition("ownerPartyId", EntityCondition.EQUALS, organizationPartyId),
+                  ec.entity.conditionFactory.makeCondition("productCategoryTypeEnumId", EntityCondition.EQUALS, "PctPareto")]
+paretoCondList = [ec.entity.conditionFactory.makeCondition(paretoFindCondList, EntityCondition.AND),
+                  ec.entity.conditionFactory.makeCondition("pareto", EntityCondition.EQUALS, null)]
+ef.condition(ec.entity.conditionFactory.makeCondition(paretoCondList, EntityCondition.OR))
+
+ef.selectFields(["productId", "supplierId", "supplierName", "pareto"])
 
 resultList = []
 resultList.addAll(ef.list())
