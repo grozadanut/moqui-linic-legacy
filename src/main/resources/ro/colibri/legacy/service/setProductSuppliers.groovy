@@ -23,6 +23,15 @@ for (i in items) {
             item.delete()
     }
 
+    // create product on the fly
+    EntityValue prod = ec.getEntity().makeValue("Product")
+    prod.set("productId", i.productId)
+    prod.set("productTypeEnumId", "PtAsset")
+    prod.set("productTypeEnumId", "PtAsset")
+    prod.set("assetTypeEnumId", "AstTpInventory")
+    prod.set("assetClassEnumId", "AsClsInventoryFin")
+    prod.createOrUpdate()
+
     agreementId = MessageFormat.format("AgrSuppl_{0}_{1}", i.organizationPartyId, i.supplierId)
     final EntityValue agreement = ec.getEntity().makeValue("Agreement")
     agreement.set("agreementId", agreementId)
