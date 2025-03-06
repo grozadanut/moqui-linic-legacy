@@ -35,7 +35,6 @@ public class LegacySyncServices {
             prod.set("productTypeEnumId", "PtAsset");
             prod.set("productName", legacyProd.getName());
             prod.set("amountUomId", mapUom(legacyProd.getUom()));
-            prod.set("productTypeEnumId", "PtAsset");
             prod.set("assetTypeEnumId", "AstTpInventory");
             prod.set("assetClassEnumId", "AsClsInventoryFin");
 
@@ -44,8 +43,17 @@ public class LegacySyncServices {
             sku.set("productId", legacyId);
             sku.set("idValue", legacyProd.getBarcode());
 
+            final EntityValue price = ec.getEntity().makeValue("mantle.product.ProductPrice");
+            price.set("productId", legacyId);
+            price.set("productPriceId", "leg"+legacyId);
+            price.set("priceTypeEnumId", "PptList");
+            price.set("pricePurposeEnumId", "PppPurchase");
+            price.set("priceUomId", "RON");
+            price.set("price", legacyProd.getPricePerUom());
+
             prod.createOrUpdate();
             sku.createOrUpdate();
+            price.createOrUpdate();
         }
 
         return Map.of();

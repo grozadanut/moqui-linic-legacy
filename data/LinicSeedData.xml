@@ -33,6 +33,18 @@
                               ownerPartyId="L2" facilityName="Colibri Depozit">
     </mantle.facility.Facility>
 
+    <mantle.product.store.ProductStore productStoreId="L1" inventoryFacilityId="L1" storeName="Linic"
+                                       organizationPartyId="L1" requireInventory="N" markupShipmentShipLabels="N"
+                                       defaultDisableShippingCalc="N" defaultDisablePromotions="N" defaultCurrencyUomId="RON"
+                                       shipmentAnyCarrierMethod="N" defaultDisableTaxCalc="N" markupOrderShipLabels="N">
+    </mantle.product.store.ProductStore>
+
+    <mantle.product.store.ProductStore productStoreId="L2" inventoryFacilityId="L2" storeName="Colibri"
+                                       organizationPartyId="L2" requireInventory="N" markupShipmentShipLabels="N"
+                                       defaultDisableShippingCalc="N" defaultDisablePromotions="N" defaultCurrencyUomId="RON"
+                                       shipmentAnyCarrierMethod="N" defaultDisableTaxCalc="N" markupOrderShipLabels="N">
+    </mantle.product.store.ProductStore>
+
     <moqui.basic.Enumeration description="Pareto" enumId="PctPareto" enumTypeId="ProductCategoryType"/>
     <mantle.product.category.ProductCategory productCategoryId="L2A" ownerPartyId="L2" productCategoryTypeEnumId="PctPareto"
                                              categoryName="Colibri Pareto A"/>
