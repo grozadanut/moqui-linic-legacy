@@ -51,9 +51,18 @@ public class LegacySyncServices {
             price.set("priceUomId", "RON");
             price.set("price", legacyProd.getPricePerUom());
 
+            final EntityValue purchPrice = ec.getEntity().makeValue("mantle.product.ProductPrice");
+            purchPrice.set("productId", legacyId);
+            purchPrice.set("productPriceId", "purch"+legacyId);
+            purchPrice.set("priceTypeEnumId", "PptAverage");
+            purchPrice.set("pricePurposeEnumId", "PppPurchase");
+            purchPrice.set("priceUomId", "RON");
+            purchPrice.set("price", legacyProd.getLastBuyingPriceNoTva());
+
             prod.createOrUpdate();
             sku.createOrUpdate();
             price.createOrUpdate();
+            purchPrice.createOrUpdate();
         }
 
         return Map.of();
