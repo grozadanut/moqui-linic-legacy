@@ -40,7 +40,7 @@ dependencyUpdates.resolutionStrategy { componentSelection { rules -> rules.all {
 
 repositories {
     flatDir name: 'localLib', dirs: frameworkDir.absolutePath + '/lib'
-    flatDir name: 'projectLib', dirs: projectDir.absolutePath + '/lib'
+    flatDir name: 'librepo', dirs: projectDir.absolutePath + '/librepo'
     mavenCentral()
 }
 
@@ -53,13 +53,16 @@ dependencies {
     testImplementation project(':framework').configurations.testImplementation.allDependencies
 
     // Add moqui-linic-legacy dependencies here
-    implementation fileTree('/libs')
+    implementation fileTree('librepo')
     implementation 'org.apache.commons:commons-csv:1.12.0'
 }
 
 // by default the Java plugin runs test on build, change to not do that (only run test if explicit task)
 // no longer workds as of gradle 4.8 or possibly earlier, use clear() instead: check.dependsOn.remove(test)
 check.dependsOn.clear()
+
+tasks.register('cleanLib', Delete) { delete fileTree(dir: projectDir.absolutePath + '/lib', include: '*') }
+clean.dependsOn cleanLib
 
 jar {
     destinationDirectory = file(projectDir.absolutePath + '/lib')
@@ -75,8 +78,8 @@ tasks.register('copyDependencies') {
         }
     }
 }
+copyDependencies.dependsOn cleanLib
 jar.dependsOn copyDependencies
-
 
 test {
     useJUnitPlatform()

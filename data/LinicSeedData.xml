@@ -33,13 +33,13 @@
                               ownerPartyId="L2" facilityName="Colibri Depozit">
     </mantle.facility.Facility>
 
-    <mantle.product.store.ProductStore productStoreId="L1" inventoryFacilityId="L1" storeName="Linic"
+    <mantle.product.store.ProductStore productStoreId="L1" inventoryFacilityId="L1" storeName="Linic" defaultLocale="ro"
                                        organizationPartyId="L1" requireInventory="N" markupShipmentShipLabels="N"
                                        defaultDisableShippingCalc="N" defaultDisablePromotions="N" defaultCurrencyUomId="RON"
                                        shipmentAnyCarrierMethod="N" defaultDisableTaxCalc="N" markupOrderShipLabels="N">
     </mantle.product.store.ProductStore>
 
-    <mantle.product.store.ProductStore productStoreId="L2" inventoryFacilityId="L2" storeName="Colibri"
+    <mantle.product.store.ProductStore productStoreId="L2" inventoryFacilityId="L2" storeName="Colibri" defaultLocale="ro"
                                        organizationPartyId="L2" requireInventory="N" markupShipmentShipLabels="N"
                                        defaultDisableShippingCalc="N" defaultDisablePromotions="N" defaultCurrencyUomId="RON"
                                        shipmentAnyCarrierMethod="N" defaultDisableTaxCalc="N" markupOrderShipLabels="N">
