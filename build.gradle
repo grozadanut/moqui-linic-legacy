@@ -55,6 +55,8 @@ dependencies {
     // Add moqui-linic-legacy dependencies here
     implementation fileTree('librepo')
     implementation 'org.apache.commons:commons-csv:1.12.0'
+
+    implementation 'io.sentry:sentry-log4j2:8.5.0'
 }
 
 // by default the Java plugin runs test on build, change to not do that (only run test if explicit task)
