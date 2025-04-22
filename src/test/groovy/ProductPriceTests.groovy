@@ -109,4 +109,59 @@ class ProductPriceTests extends Specification {
         regularPrice.price == 100.00
         vipPrice.price == 80.00
     }
+
+    def "both customer specific pricing and quantity promotion"() {
+        setup:
+        ec.service.sync().name("store#Party")
+                .parameters([partyId: "VIP-CUST-2", partyTypeEnumId: "PtyOrganization"])
+                .call()
+        ec.service.sync().name("store#Organization")
+                .parameters([partyId: "VIP-CUST-2", organizationName: "VIP Customer"])
+                .call()
+        ec.service.sync().name("store#PartyRole")
+                .parameters([partyId: "VIP-CUST-2", roleTypeId: "Customer"])
+                .call()
+        ec.service.sync().name("store#Product")
+                .parameters([productId: "TEST-PROD-5", productName: "VIP Product Quant"])
+                .call()
+        ec.service.sync().name("store#ProductPrice")
+                .parameters([productPriceId: "TEST-PROD-5-1", productId: "TEST-PROD-5", priceTypeEnumId: "PptList",
+                             pricePurposeEnumId: "PppPurchase", priceUomId: "RON", price: 100.00])
+                .call()
+        ec.service.sync().name("store#ProductPrice")
+                .parameters([productPriceId: "TEST-PROD-5-2", productId: "TEST-PROD-5", priceTypeEnumId: "PptList",
+                             pricePurposeEnumId: "PppPurchase", priceUomId: "RON", price: 80.00,
+                             customerPartyId: "VIP-CUST-2"])
+                .call()
+        ec.service.sync().name("store#ProductPrice")
+                .parameters([productPriceId: "TEST-PROD-5-3", productId: "TEST-PROD-5", priceTypeEnumId: "PptList",
+                             pricePurposeEnumId: "PppPurchase", priceUomId: "RON", price: 90.00,
+                             minQuantity: 10])
+                .call()
+        ec.service.sync().name("store#ProductPrice")
+                .parameters([productPriceId: "TEST-PROD-5-4", productId: "TEST-PROD-5", priceTypeEnumId: "PptList",
+                             pricePurposeEnumId: "PppPurchase", priceUomId: "RON", price: 70.00,
+                             minQuantity: 20, customerPartyId: "VIP-CUST-2"])
+                .call()
+
+        when:
+        def regularPrice = ec.service.sync().name("mantle.product.PriceServices.get#ProductPrice")
+                .parameter("productId", "TEST-PROD-5")
+                .call()
+        def quantityPrice = ec.service.sync().name("mantle.product.PriceServices.get#ProductPrice")
+                .parameters([productId: "TEST-PROD-5", quantity: 10])
+                .call()
+        def vipPrice = ec.service.sync().name("mantle.product.PriceServices.get#ProductPrice")
+                .parameters([productId: "TEST-PROD-5", quantity: 10, customerPartyId: "VIP-CUST-2"])
+                .call()
+        def vipQuantPrice = ec.service.sync().name("mantle.product.PriceServices.get#ProductPrice")
+                .parameters([productId: "TEST-PROD-5", quantity: 20, customerPartyId: "VIP-CUST-2"])
+                .call()
+
+        then:
+        regularPrice.price == 100.00
+        quantityPrice.price == 90.00
+        vipPrice.price == 80.00
+        vipQuantPrice.price == 70.00
+    }
 }
