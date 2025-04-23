@@ -45,6 +45,30 @@ class ProductPriceTests extends Specification {
         price.price == 29.99
     }
 
+    def "promotional price"() {
+        setup:
+        ec.service.sync().name("store#Product")
+                .parameters([productId: "TEST-PROD-2", productName: "Promotional Product"])
+                .call()
+        ec.service.sync().name("store#ProductPrice")
+                .parameters([productPriceId: "TEST-PROD-2-1", productId: "TEST-PROD-2", priceTypeEnumId: "PptList",
+                             pricePurposeEnumId: "PppPurchase", priceUomId: "RON", price: 100.00])
+                .call()
+        ec.service.sync().name("store#ProductPrice")
+                .parameters([productPriceId: "TEST-PROD-2-2", productId: "TEST-PROD-2", priceTypeEnumId: "PptCurrent",
+                             pricePurposeEnumId: "PppPurchase", priceUomId: "RON", price: 80.00])
+                .call()
+
+        when:
+        def price = ec.service.sync().name("mantle.product.PriceServices.get#ProductPrice")
+                .parameters([productId: "TEST-PROD-2"])
+                .call()
+
+        then:
+        price.price == 80.00
+        price.listPrice == 100.00
+    }
+
     def "tiered pricing based on quantity"() {
         setup:
         ec.service.sync().name("store#Product")
@@ -55,7 +79,7 @@ class ProductPriceTests extends Specification {
                              pricePurposeEnumId: "PppPurchase", priceUomId: "RON", price: 10.00])
                 .call()
         ec.service.sync().name("store#ProductPrice")
-                .parameters([productPriceId: "TEST-PROD-3-2", productId: "TEST-PROD-3", priceTypeEnumId: "PptList",
+                .parameters([productPriceId: "TEST-PROD-3-2", productId: "TEST-PROD-3", priceTypeEnumId: "PptCurrent",
                              pricePurposeEnumId: "PppPurchase", priceUomId: "RON", price: 8.00,
                              minQuantity: 10])
                 .call()
@@ -92,7 +116,7 @@ class ProductPriceTests extends Specification {
                              pricePurposeEnumId: "PppPurchase", priceUomId: "RON", price: 100.00])
                 .call()
         ec.service.sync().name("store#ProductPrice")
-                .parameters([productPriceId: "TEST-PROD-4-2", productId: "TEST-PROD-4", priceTypeEnumId: "PptList",
+                .parameters([productPriceId: "TEST-PROD-4-2", productId: "TEST-PROD-4", priceTypeEnumId: "PptCurrent",
                              pricePurposeEnumId: "PppPurchase", priceUomId: "RON", price: 80.00,
                              customerPartyId: "VIP-CUST-1"])
                 .call()
@@ -129,17 +153,17 @@ class ProductPriceTests extends Specification {
                              pricePurposeEnumId: "PppPurchase", priceUomId: "RON", price: 100.00])
                 .call()
         ec.service.sync().name("store#ProductPrice")
-                .parameters([productPriceId: "TEST-PROD-5-2", productId: "TEST-PROD-5", priceTypeEnumId: "PptList",
+                .parameters([productPriceId: "TEST-PROD-5-2", productId: "TEST-PROD-5", priceTypeEnumId: "PptCurrent",
                              pricePurposeEnumId: "PppPurchase", priceUomId: "RON", price: 80.00,
                              customerPartyId: "VIP-CUST-2"])
                 .call()
         ec.service.sync().name("store#ProductPrice")
-                .parameters([productPriceId: "TEST-PROD-5-3", productId: "TEST-PROD-5", priceTypeEnumId: "PptList",
+                .parameters([productPriceId: "TEST-PROD-5-3", productId: "TEST-PROD-5", priceTypeEnumId: "PptCurrent",
                              pricePurposeEnumId: "PppPurchase", priceUomId: "RON", price: 90.00,
                              minQuantity: 10])
                 .call()
         ec.service.sync().name("store#ProductPrice")
-                .parameters([productPriceId: "TEST-PROD-5-4", productId: "TEST-PROD-5", priceTypeEnumId: "PptList",
+                .parameters([productPriceId: "TEST-PROD-5-4", productId: "TEST-PROD-5", priceTypeEnumId: "PptCurrent",
                              pricePurposeEnumId: "PppPurchase", priceUomId: "RON", price: 70.00,
                              minQuantity: 20, customerPartyId: "VIP-CUST-2"])
                 .call()
