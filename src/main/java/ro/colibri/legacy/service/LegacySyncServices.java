@@ -43,26 +43,26 @@ public class LegacySyncServices {
             sku.set("productId", legacyId);
             sku.set("idValue", legacyProd.getBarcode());
 
-            final EntityValue price = ec.getEntity().makeValue("mantle.product.ProductPrice");
-            price.set("productId", legacyId);
-            price.set("productPriceId", "leg"+legacyId);
-            price.set("priceTypeEnumId", "PptList");
-            price.set("pricePurposeEnumId", "PppPurchase");
-            price.set("priceUomId", "RON");
-            price.set("price", legacyProd.getPricePerUom());
-
-            final EntityValue purchPrice = ec.getEntity().makeValue("mantle.product.ProductPrice");
-            purchPrice.set("productId", legacyId);
-            purchPrice.set("productPriceId", "purch"+legacyId);
-            purchPrice.set("priceTypeEnumId", "PptAverage");
-            purchPrice.set("pricePurposeEnumId", "PppPurchase");
-            purchPrice.set("priceUomId", "RON");
-            purchPrice.set("price", legacyProd.getLastBuyingPriceNoTva());
+//            final EntityValue price = ec.getEntity().makeValue("mantle.product.ProductPrice");
+//            price.set("productId", legacyId);
+//            price.set("productPriceId", "leg"+legacyId);
+//            price.set("priceTypeEnumId", "PptList");
+//            price.set("pricePurposeEnumId", "PppPurchase");
+//            price.set("priceUomId", "RON");
+//            price.set("price", legacyProd.getPricePerUom());
+//
+//            final EntityValue purchPrice = ec.getEntity().makeValue("mantle.product.ProductPrice");
+//            purchPrice.set("productId", legacyId);
+//            purchPrice.set("productPriceId", "purch"+legacyId);
+//            purchPrice.set("priceTypeEnumId", "PptAverage");
+//            purchPrice.set("pricePurposeEnumId", "PppPurchase");
+//            purchPrice.set("priceUomId", "RON");
+//            purchPrice.set("price", legacyProd.getLastBuyingPriceNoTva());
 
             prod.createOrUpdate();
             sku.createOrUpdate();
-            price.createOrUpdate();
-            purchPrice.createOrUpdate();
+//            price.createOrUpdate();
+//            purchPrice.createOrUpdate();
         }
 
         return Map.of();
