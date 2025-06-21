@@ -6,32 +6,32 @@ import org.moqui.entity.EntityFind
 
 ExecutionContext ec = context.ec
 
-EntityFind ef = ec.entity.find("AgreementItem").distinct(true)
+EntityFind ef = ec.entity.find("ProductPrice").distinct(true)
 
 dv = ef.makeEntityDynamicView()
-dv.addMemberEntity("AI", "AgreementItem", null, null, null)
-dv.addMemberEntity("AGR", "Agreement", "AI", null, ["agreementId":null])
-dv.addMemberEntity("ORG", "Organization", "AGR", null, ["otherPartyId":"partyId"])
-dv.addMemberEntity("P", "Product", "AI", null, ["productId":null])
+dv.addMemberEntity("PP", "ProductPrice", null, null, null)
+dv.addMemberEntity("P", "Product", "PP", null, ["productId":null])
 dv.addMemberEntity("PCM", "ProductCategoryMember", "P", true, ["productId":null])
 dv.addMemberEntity("PC", "ProductCategory", "PCM", true, ["productCategoryId":null])
-dv.addAlias("AI", "agreementItemTypeEnumId")
-dv.addAlias("AI", "productId")
-dv.addAlias("AGR", "agreementTypeEnumId")
-dv.addAlias("AGR", "otherRoleTypeId")
-dv.addAlias("AGR", "organizationPartyId")
-dv.addAlias("AGR", "supplierId", "otherPartyId", null)
-dv.addAlias("ORG", "supplierName", "organizationName", null)
+dv.addMemberEntity("SUP", "Organization", "PP", null, ["vendorPartyId":"partyId"])
+dv.addAlias("PP", "productPriceId")
+dv.addAlias("PP", "productId")
+dv.addAlias("PP", "customerPartyId")
+dv.addAlias("PP", "priceTypeEnumId")
+dv.addAlias("PP", "pricePurposeEnumId")
+dv.addAlias("PP", "price")
+dv.addAlias("PP", "supplierId", "vendorPartyId", null)
+dv.addAlias("PP", "preferredOrderEnumId")
+dv.addAlias("SUP", "supplierName", "organizationName", null)
 dv.addAlias("P", "requireInventory")
 dv.addAlias("PC", "ownerPartyId")
 dv.addAlias("PC", "productCategoryTypeEnumId")
 dv.addAlias("PCM", "pareto", "productCategoryId", null)
 
-ef.condition("agreementItemTypeEnumId", "AitPurchase")
 ef.condition("productId", EntityCondition.IS_NOT_NULL, null)
-ef.condition("agreementTypeEnumId", "AgrProduct")
-ef.condition("otherRoleTypeId", "Supplier")
-ef.condition("organizationPartyId", organizationPartyId)
+ef.condition("customerPartyId", organizationPartyId)
+ef.condition("priceTypeEnumId", "PptCurrent")
+ef.condition("pricePurposeEnumId", "PppPurchase")
 reqinvCondList = [ec.entity.conditionFactory.makeCondition("requireInventory", EntityCondition.EQUALS, null),
               ec.entity.conditionFactory.makeCondition("requireInventory", EntityCondition.EQUALS, "Y")]
 ef.condition(ec.entity.conditionFactory.makeCondition(reqinvCondList, EntityCondition.OR))
@@ -42,7 +42,7 @@ paretoCondList = [ec.entity.conditionFactory.makeCondition(paretoFindCondList, E
                   ec.entity.conditionFactory.makeCondition("pareto", EntityCondition.EQUALS, null)]
 ef.condition(ec.entity.conditionFactory.makeCondition(paretoCondList, EntityCondition.OR))
 
-ef.selectFields(["productId", "supplierId", "supplierName", "pareto"])
+ef.selectFields(["productPriceId", "productId", "supplierId", "supplierName", "pareto", "price", "preferredOrderEnumId"])
 
 resultList = []
 resultList.addAll(ef.list())

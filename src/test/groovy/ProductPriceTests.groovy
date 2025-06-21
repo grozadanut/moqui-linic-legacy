@@ -188,4 +188,35 @@ class ProductPriceTests extends Specification {
         vipPrice.price == 80.00
         vipQuantPrice.price == 70.00
     }
+
+    def "base supplier purchase price"() {
+        setup:
+        ec.service.sync().name("store#Party")
+                .parameters([partyId: "SUPPL-1", partyTypeEnumId: "PtyOrganization"])
+                .call()
+        ec.service.sync().name("store#Organization")
+                .parameters([partyId: "SUPPL-1", organizationName: "Supplier"])
+                .call()
+        ec.service.sync().name("store#PartyRole")
+                .parameters([partyId: "SUPPL-1", roleTypeId: "Supplier"])
+                .call()
+        ec.service.sync().name("store#Product")
+                .parameters([productId: "TEST-PROD-6", productName: "Test Product to purchase"])
+                .call()
+        ec.service.sync().name("store#ProductPrice")
+                .parameters([productPriceId: "SUPPL-1_TEST-PROD-6", productId: "TEST-PROD-6",
+                             vendorPartyId: "SUPPL-1", customerPartyId: "L2",
+                             priceTypeEnumId: "PptCurrent", pricePurposeEnumId: "PppPurchase",
+                             price: 32.9, priceUomId: "RON"])
+                .call()
+
+        when:
+        def price = ec.service.sync()
+                .name("mantle.product.PriceServices.get#ProductPrice")
+                .parameters([productId: "TEST-PROD-6", vendorPartyId: "SUPPL-1", customerPartyId: "L2"])
+                .call()
+
+        then:
+        price.price == 32.9
+    }
 }

@@ -66,19 +66,28 @@ along with this software (see the LICENSE.md file). If not, see
         </out-parameters>
     </service>
 
-    <service verb="set" noun="ProductSuppliers" type="script"
-             location="classpath://ro/colibri/legacy/service/setProductSuppliers.groovy">
+    <service verb="set" noun="MainProductSuppliers" type="script"
+             location="classpath://ro/colibri/legacy/service/setMainProductSuppliers.groovy">
+        <description>
+            Currently just sets the main supplier for the product.
+        </description>
         <in-parameters>
             <parameter name="items" type="List">
                 <parameter name="item" type="Map">
                     <parameter name="organizationPartyId" required="true"/>
                     <parameter name="productId" required="true"/>
                     <parameter name="supplierId" required="true"/>
+                    <parameter name="price"/>
                 </parameter>
             </parameter>
         </in-parameters>
         <out-parameters>
             <parameter name="resultList" type="List"/>
         </out-parameters>
+    </service>
+
+    <!--Temporary, to be removed-->
+    <service verb="migrate" noun="ProductSuppliers" type="script"
+             location="classpath://ro/colibri/legacy/service/migrateProductSuppliers.groovy">
     </service>
 </services>
