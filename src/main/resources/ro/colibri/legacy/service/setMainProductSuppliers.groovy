@@ -31,7 +31,7 @@ for (i in items) {
 
     resultList.add(
             ec.service.sync().name("store", "mantle.product.ProductPrice")
-                    .parameters([productPriceId: i.supplierId+"_"+i.productId,
+                    .parameters([productPriceId: i.supplierId+"_"+i.productId+"_"+i.organizationPartyId,
                                  productId: i.productId,
                                  vendorPartyId: i.supplierId,
                                  preferredOrderEnumId: "SpoMain",
