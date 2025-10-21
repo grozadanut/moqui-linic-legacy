@@ -52,7 +52,7 @@ class ReceiveAnafInvoiceTests extends Specification {
 
         then:
         msg.systemMessageTypeId == "ANAFReceivedInvoice"
-        msg.statusId == "SmsgConfirmed"
+        msg.statusId == "SmsgConsumed"
         msg.isOutgoing == "N"
         msg.messageText == rawXml
         msg.senderId == "RO14998343"
@@ -80,7 +80,7 @@ class ReceiveAnafInvoiceTests extends Specification {
 
         then:
         msg.systemMessageTypeId == "ANAFReceivedInvoice"
-        msg.statusId == "SmsgConfirmed"
+        msg.statusId == "SmsgConsumed"
         msg.isOutgoing == "N"
         msg.messageText == rawXml
         msg.senderId == "RO7568475"

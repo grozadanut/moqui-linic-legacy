@@ -27,7 +27,7 @@ if (docType.equalsIgnoreCase("Invoice")) {
 
 msg.set("systemMessageId", systemMessageId)
 msg.set("systemMessageTypeId", "ANAFReceivedInvoice")
-msg.set("statusId", "SmsgConfirmed")
+msg.set("statusId", "SmsgConsumed")
 msg.set("isOutgoing", "N")
 msg.set("initDate", ec.user.nowTimestamp)
 msg.set("processedDate", ec.user.nowTimestamp)
