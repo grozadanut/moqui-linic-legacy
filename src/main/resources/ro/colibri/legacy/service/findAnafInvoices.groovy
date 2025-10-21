@@ -71,5 +71,6 @@ for (msg in ef.list()) {
 
     resultList.add(["id": msg.id, "senderId": msg.senderId, "issueDate": msg.issueDate, "invoiceNumber": msg.invoiceNumber,
                     "invoiceId": msg.invoiceId, "statusId": msg.statusId, "invoiceTotal": invoiceTotal,
-                    "taxTotal": taxTotal, "taxExclusiveAmount": taxExclusiveAmount, "senderName": senderName])
+                    "taxTotal": taxTotal, "taxExclusiveAmount": taxExclusiveAmount, "senderName": senderName,
+                    "rawXml": msg.messageText])
 }
