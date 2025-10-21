@@ -56,4 +56,7 @@
                                              categoryName="Colibri Produse in stoc(S)"/>
     <mantle.product.category.ProductCategory productCategoryId="L2K" ownerPartyId="L2" productCategoryTypeEnumId="PctInventoryGroup"
                                              categoryName="Colibri Produse la Comanda(K)"/>
+
+    <moqui.service.message.SystemMessageType systemMessageTypeId="ANAFReceivedInvoice"
+                                             description="Invoice received through a message from ANAF eFactura"/>
 </entity-facade-xml>

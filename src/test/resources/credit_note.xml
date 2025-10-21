@@ -1,0 +1,125 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<CreditNote xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDataTypes-2" xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2" xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2">
+ <cbc:UBLVersionID>2.1</cbc:UBLVersionID>
+ <cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:efactura.mfinante.ro:CIUS-RO:1.0.1</cbc:CustomizationID>
+ <cbc:ID>FBON01</cbc:ID><!--BT-1-->
+ <cbc:IssueDate>2024-01-31</cbc:IssueDate><!--BT-2-->
+ <cbc:CreditNoteTypeCode>381</cbc:CreditNoteTypeCode>
+ <cbc:DocumentCurrencyCode>RON</cbc:DocumentCurrencyCode><!--BT-5-->
+ <cbc:TaxCurrencyCode>RON</cbc:TaxCurrencyCode><!--BT-6-->
+ <cac:ContractDocumentReference>
+  <cbc:ID>plata 1% luna ianuarie 2024</cbc:ID><!--BT-12-->
+ </cac:ContractDocumentReference>
+ <cac:AccountingSupplierParty>
+  <cac:Party>
+   <cac:PartyName>
+    <cbc:Name>BAUMIT ROMANIA COM SRL</cbc:Name>
+   </cac:PartyName>
+   <cac:PostalAddress>
+    <cbc:StreetName>Bvd Iuliu Maniu, nr 600 A</cbc:StreetName><!--BT-35-->
+    <cbc:CityName>SECTOR6</cbc:CityName><!--BT-37-->
+    <cbc:PostalZone>061129</cbc:PostalZone><!--BT-38-->
+    <cbc:CountrySubentity>RO-B</cbc:CountrySubentity><!--BT-39-->
+    <cac:Country>
+     <cbc:IdentificationCode>RO</cbc:IdentificationCode><!--BT-40-->
+    </cac:Country>
+   </cac:PostalAddress>
+   <cac:PartyTaxScheme>
+    <cbc:CompanyID>RO7568475</cbc:CompanyID><!--BT-31-->
+    <cac:TaxScheme>
+     <cbc:ID>VAT</cbc:ID>
+    </cac:TaxScheme>
+   </cac:PartyTaxScheme>
+   <cac:PartyLegalEntity>
+    <cbc:RegistrationName>BAUMIT ROMANIA COM SRL</cbc:RegistrationName><!--BT-27-->
+    <cbc:CompanyID>J40/6207/1995</cbc:CompanyID><!--BT-30-->
+   </cac:PartyLegalEntity>
+  </cac:Party>
+ </cac:AccountingSupplierParty>
+ <cac:AccountingCustomerParty>
+  <cac:Party>
+   <cac:PartyName>
+    <cbc:Name>LINIC SRL</cbc:Name>
+   </cac:PartyName>
+   <cac:PostalAddress>
+    <cbc:StreetName>STRADA PRINCIPALA, NR 218A, LOCALITATE MARGINE</cbc:StreetName>
+    <cbc:CityName>Marghita</cbc:CityName>
+    <cbc:CountrySubentity>RO-BH</cbc:CountrySubentity>
+    <cac:Country>
+     <cbc:IdentificationCode>RO</cbc:IdentificationCode>
+    </cac:Country>
+   </cac:PostalAddress>
+   <cac:PartyTaxScheme>
+    <cbc:CompanyID>RO14998343</cbc:CompanyID>
+    <cac:TaxScheme>
+     <cbc:ID>VAT</cbc:ID>
+    </cac:TaxScheme>
+   </cac:PartyTaxScheme>
+   <cac:PartyLegalEntity>
+    <cbc:RegistrationName>LINIC SRL</cbc:RegistrationName>
+    <cbc:CompanyID>J05/1111/2002</cbc:CompanyID>
+   </cac:PartyLegalEntity>
+  </cac:Party>
+ </cac:AccountingCustomerParty>
+ <cac:Delivery>
+  <cac:DeliveryLocation>
+   <cac:Address>
+    <cbc:StreetName>Str. Nicolae Balcescu nr 51, Marghita, jud Bihor.</cbc:StreetName>
+    <cbc:CityName>Marghita</cbc:CityName>
+    <cbc:CountrySubentity>RO-BH</cbc:CountrySubentity>
+    <cac:Country>
+     <cbc:IdentificationCode>RO</cbc:IdentificationCode>
+    </cac:Country>
+   </cac:Address>
+  </cac:DeliveryLocation>
+ </cac:Delivery>
+ <cac:PaymentMeans>
+  <cbc:PaymentMeansCode>1</cbc:PaymentMeansCode><!--BT-81-->
+  <cac:PayeeFinancialAccount>
+   <cbc:ID>RO29RZBR00000</cbc:ID><!--BT-84-->
+   <cbc:Name>RAIFFESISEN APUSULUI</cbc:Name><!--BT-85-->
+  </cac:PayeeFinancialAccount>
+ </cac:PaymentMeans>
+ <cac:TaxTotal>
+  <cbc:TaxAmount currencyID="RON">-84.13</cbc:TaxAmount>
+  <cac:TaxSubtotal>
+   <cbc:TaxableAmount currencyID="RON">-442.78</cbc:TaxableAmount>
+   <cbc:TaxAmount currencyID="RON">-84.13</cbc:TaxAmount>
+   <cac:TaxCategory>
+    <cbc:ID>S</cbc:ID>
+    <cbc:Percent>19.00</cbc:Percent>
+    <cac:TaxScheme>
+     <cbc:ID>VAT</cbc:ID>
+    </cac:TaxScheme>
+   </cac:TaxCategory>
+  </cac:TaxSubtotal>
+ </cac:TaxTotal>
+ <cac:LegalMonetaryTotal>
+  <cbc:LineExtensionAmount currencyID="RON">-442.78</cbc:LineExtensionAmount>
+  <cbc:TaxExclusiveAmount currencyID="RON">-442.78</cbc:TaxExclusiveAmount>
+  <cbc:TaxInclusiveAmount currencyID="RON">-526.91</cbc:TaxInclusiveAmount>
+  <cbc:AllowanceTotalAmount currencyID="RON">0.00</cbc:AllowanceTotalAmount>
+  <cbc:ChargeTotalAmount currencyID="RON">0.00</cbc:ChargeTotalAmount>
+  <cbc:PayableAmount currencyID="RON">-526.91</cbc:PayableAmount>
+ </cac:LegalMonetaryTotal>
+ <cac:CreditNoteLine>
+  <cbc:ID>1</cbc:ID><!--BT-126-->
+  <cbc:CreditedQuantity unitCode="H87">-1.00</cbc:CreditedQuantity><!--BT-129--><!--BT-130-->
+  <cbc:LineExtensionAmount currencyID="RON">-442.78</cbc:LineExtensionAmount><!--BT-131-->
+  <cac:Item>
+   <cbc:Description>Skonto pl.avans,dir.debit</cbc:Description><!--BT-154-->
+   <cbc:Name>Skonto pl.avans,dir.debit</cbc:Name><!--BT-153-->
+   <cac:ClassifiedTaxCategory>
+    <cbc:ID>S</cbc:ID><!--BT-151-->
+    <cbc:Percent>19.00</cbc:Percent><!--BT-152-->
+    <cac:TaxScheme>
+     <cbc:ID>VAT</cbc:ID>
+    </cac:TaxScheme>
+   </cac:ClassifiedTaxCategory>
+  </cac:Item>
+  <cac:Price>
+   <cbc:PriceAmount currencyID="RON">442.78</cbc:PriceAmount><!--BT-146-->
+   <cbc:BaseQuantity unitCode="H87">1.00</cbc:BaseQuantity><!--BT-149--><!--BT-150-->
+  </cac:Price>
+ </cac:CreditNoteLine>
+</CreditNote>
