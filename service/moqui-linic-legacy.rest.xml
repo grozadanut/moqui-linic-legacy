@@ -33,4 +33,7 @@ along with this software (see the LICENSE.md file). If not, see
     <resource name="anafInvoices" description="API for ANAF eFactura invoices">
         <method type="get"><service name="AnafServices.find#AnafInvoices"/></method>
     </resource>
+    <resource name="anafInvoiceLines" description="Get Invoice lines from an ANAF eFactura invoice">
+        <method type="get"><service name="AnafServices.find#AnafInvoiceLines"/></method>
+    </resource>
 </resource>

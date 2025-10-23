@@ -59,4 +59,6 @@
 
     <moqui.service.message.SystemMessageType systemMessageTypeId="ANAFReceivedInvoice"
                                              description="Invoice received through a message from ANAF eFactura"/>
+    <moqui.service.message.SystemMessageType systemMessageTypeId="ANAFReceivedInvoiceLine"
+                                             description="Invoice line split from an ANAF eInvoice"/>
 </entity-facade-xml>

@@ -19,9 +19,9 @@ msg.set("receiverId", rootNode.first("cac:AccountingCustomerParty").first("cac:P
 msg.set("docControl", rootNode.first("cac:LegalMonetaryTotal").first("cbc:TaxInclusiveAmount").text)
 
 if (docType.equalsIgnoreCase("Invoice")) {
-    msg.set("docType", rootNode.first("cbc:InvoiceTypeCode").text)
+    msg.set("docSubType", rootNode.first("cbc:InvoiceTypeCode").text)
 } else if (docType.equalsIgnoreCase("CreditNote")) {
-    msg.set("docType", rootNode.first("cbc:CreditNoteTypeCode").text)
+    msg.set("docSubType", rootNode.first("cbc:CreditNoteTypeCode").text)
 } else
     throw new ServiceException(docType + " document type not supported")
 
@@ -33,5 +33,5 @@ msg.set("initDate", ec.user.nowTimestamp)
 msg.set("processedDate", ec.user.nowTimestamp)
 msg.set("messageText", messageText)
 msg.set("messageDate", messageDate)
-msg.set("docSubType", docType)
+msg.set("docType", docType)
 msg.create()

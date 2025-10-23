@@ -16,8 +16,18 @@ along with this software (see the LICENSE.md file). If not, see
     <service verb="find" noun="AnafInvoices" type="script"
              location="classpath://ro/colibri/legacy/service/findAnafInvoices.groovy">
         <in-parameters>
-            <parameter name="start" type="Timestamp"/>
-            <parameter name="end" type="Timestamp"/>
+            <parameter name="start" type="Timestamp" required="true"/>
+            <parameter name="end" type="Timestamp" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="resultList" type="List">
+            </parameter>
+        </out-parameters>
+    </service>
+    <service verb="find" noun="AnafInvoiceLines" type="script"
+             location="classpath://ro/colibri/legacy/service/findAnafInvoiceLines.groovy">
+        <in-parameters>
+            <parameter name="systemMessageId" required="true"/>
         </in-parameters>
         <out-parameters>
             <parameter name="resultList" type="List">
@@ -31,6 +41,12 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="systemMessageId" required="true"/>
             <parameter name="messageDate" type="Date"/>
             <parameter name="messageText" allow-html="any"/>
+        </in-parameters>
+    </service>
+    <service verb="expand" noun="AnafInvoiceLines" type="script"
+             location="classpath://ro/colibri/legacy/service/expandAnafInvoiceLines.groovy">
+        <in-parameters>
+            <parameter name="systemMessageId" required="true"/>
         </in-parameters>
     </service>
 </services>

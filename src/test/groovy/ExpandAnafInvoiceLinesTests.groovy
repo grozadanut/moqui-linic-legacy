@@ -6,7 +6,7 @@ import spock.lang.Specification
 import java.nio.file.Files
 import java.nio.file.Paths
 
-class ReceiveAnafInvoiceTests extends Specification {
+class ExpandAnafInvoiceLinesTests extends Specification {
     @Shared
     ExecutionContext ec
 
@@ -26,69 +26,70 @@ class ReceiveAnafInvoiceTests extends Specification {
 
     def cleanup() {
         ec.service.sync().name("delete#moqui.service.message.SystemMessage")
-                .parameters([systemMessageId: "12345"])
+                .parameters([systemMessageId: "EAILT_1_427941"])
                 .call()
         ec.service.sync().name("delete#moqui.service.message.SystemMessage")
-                .parameters([systemMessageId: "12346"])
+                .parameters([systemMessageId: "EAILT_2_1"])
                 .call()
+        ec.service.sync().name("delete#moqui.service.message.SystemMessage")
+                .parameters([systemMessageId: "EAILT_1"])
+                .call()
+        ec.service.sync().name("delete#moqui.service.message.SystemMessage")
+                .parameters([systemMessageId: "EAILT_2"])
+                .call()
+
 
         ec.artifactExecution.enableAuthz()
         ec.transaction.commit()
     }
 
-    def "received invoice"() {
+    def "expand received invoice"() {
         setup:
         var rawXml = Files.readString(Paths.get("src", "test", "resources", "invoice.xml"))
-
-        when:
         ec.service.sync().name("AnafServices.receive#AnafInvoice")
-                .parameters([systemMessageId: "12345", messageDate: "2024-01-25",
+                .parameters([systemMessageId: "EAILT_1", messageDate: "2024-01-25",
                              messageText: rawXml])
                 .call()
 
+        when:
+        ec.service.sync().name("AnafServices.expand#AnafInvoiceLines")
+                .parameters([systemMessageId: "EAILT_1"])
+                .call()
+
         def msg = ec.entity.find("moqui.service.message.SystemMessage")
-                .condition("systemMessageId", "12345")
+                .condition("systemMessageId", "EAILT_1_427941")
                 .one()
 
         then:
-        msg.systemMessageTypeId == "ANAFReceivedInvoice"
+        msg.systemMessageTypeId == "ANAFReceivedInvoiceLine"
         msg.statusId == "SmsgConsumed"
         msg.isOutgoing == "N"
-        msg.messageText == rawXml
-        msg.senderId == "RO14998343"
-        msg.receiverId == "RO14998343"
-        msg.messageId == "LINDL2-623"
-        msg.messageDate.toString() == "2024-01-25 00:00:00.0"
-        msg.docSubType == "380"
-        msg.docType == "Invoice"
-        msg.docControl == "1.99"
+        msg.parentMessageId == "EAILT_1"
+        msg.messageText.toString().startsWith("<cac:InvoiceLine>")
     }
 
-    def "received credit note"() {
+    def "expand received credit note"() {
         setup:
         var rawXml = Files.readString(Paths.get("src", "test", "resources", "credit_note.xml"))
-
-        when:
         ec.service.sync().name("AnafServices.receive#AnafInvoice")
-                .parameters([systemMessageId: "12346", messageDate: "2024-01-31",
+                .parameters([systemMessageId: "EAILT_2", messageDate: "2024-01-31",
                              messageText: rawXml])
                 .call()
 
+        when:
+        ec.service.sync().name("AnafServices.expand#AnafInvoiceLines")
+                .parameters([systemMessageId: "EAILT_2"])
+                .call()
+
         def msg = ec.entity.find("moqui.service.message.SystemMessage")
-                .condition("systemMessageId", "12346")
+                .condition("systemMessageId", "EAILT_2_1")
                 .one()
 
         then:
-        msg.systemMessageTypeId == "ANAFReceivedInvoice"
+        msg.systemMessageTypeId == "ANAFReceivedInvoiceLine"
         msg.statusId == "SmsgConsumed"
         msg.isOutgoing == "N"
-        msg.messageText == rawXml
-        msg.senderId == "RO7568475"
-        msg.receiverId == "RO14998343"
-        msg.messageId == "FBON01"
-        msg.messageDate.toString() == "2024-01-31 00:00:00.0"
-        msg.docSubType == "381"
-        msg.docType == "CreditNote"
-        msg.docControl == "-526.91"
+        msg.parentMessageId == "EAILT_2"
+        msg.messageText.toString().startsWith("<cac:CreditNoteLine>")
     }
 }

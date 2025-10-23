@@ -4,7 +4,7 @@ import org.junit.platform.suite.api.Suite
 import org.moqui.Moqui
 
 @Suite
-@SelectClasses([ ProductPriceTests.class, ReceiveAnafInvoiceTests.class ])
+@SelectClasses([ ProductPriceTests.class, ReceiveAnafInvoiceTests.class, ExpandAnafInvoiceLinesTests.class ])
 class LegacySuite {
     @AfterAll
     static void destroyMoqui() {
