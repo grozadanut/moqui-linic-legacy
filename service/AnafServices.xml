@@ -35,8 +35,8 @@ along with this software (see the LICENSE.md file). If not, see
         </out-parameters>
     </service>
 
-    <service verb="receive" noun="AnafInvoice" type="script"
-             location="classpath://ro/colibri/legacy/service/receiveAnafInvoice.groovy">
+    <service verb="consume" noun="AnafInvoice" type="script"
+             location="classpath://ro/colibri/legacy/service/consumeAnafInvoice.groovy">
         <in-parameters>
             <parameter name="systemMessageId" required="true"/>
             <parameter name="messageDate" type="Date"/>
@@ -48,5 +48,33 @@ along with this software (see the LICENSE.md file). If not, see
         <in-parameters>
             <parameter name="systemMessageId" required="true"/>
         </in-parameters>
+    </service>
+
+    <service verb="receive" noun="AnafInvoice">
+        <description>Marks the message as SmsgConfirmed and links it with the Invoice id if present</description>
+        <in-parameters>
+            <parameter name="systemMessageId" required="true"/>
+            <parameter name="invoiceId"/>
+        </in-parameters>
+        <actions>
+            <entity-find-one entity-name="moqui.service.message.SystemMessage" value-field="systemMessage"/>
+
+            <if condition="systemMessage.statusId != 'SmsgConsumed'">
+                <return error="true" message="System message [${systemMessageId}] has status [${systemMessage.statusId}] and must be SmsgConsumed, not receiving."/></if>
+
+            <if condition="systemMessage.systemMessageTypeId != 'ANAFReceivedInvoice'">
+                <return error="true" message="System message [${systemMessageId}] has message type [${systemMessage.systemMessageTypeId}] and must be ANAFReceivedInvoice, not receiving."/></if>
+
+            <service-call name="update#moqui.service.message.SystemMessage"
+                          in-map="[systemMessageId:systemMessageId, statusId:'SmsgConfirmed',
+                                processedDate:nowDate]"/>
+
+            <if condition="invoiceId != null">
+                <service-call name="create#mantle.account.invoice.Invoice"
+                              in-map="[invoiceId:invoiceId]"/>
+                <service-call name="create#mantle.account.invoice.InvoiceSystemMessage"
+                              in-map="[systemMessageId:systemMessageId, invoiceId:invoiceId]"/>
+            </if>
+        </actions>
     </service>
 </services>

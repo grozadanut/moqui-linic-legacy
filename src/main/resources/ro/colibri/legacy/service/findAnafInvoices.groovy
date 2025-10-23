@@ -37,7 +37,7 @@ for (receivedAnafInvoice in receivedAnafInvoices) {
             .condition("systemMessageId", id)
             .count() == 0) {
         // create new messages for received anaf einvoices
-        ec.service.sync().name("AnafServices.receive#AnafInvoice")
+        ec.service.sync().name("AnafServices.consume#AnafInvoice")
                 .parameters([systemMessageId: id, messageDate: issueDate, messageText: xmlRaw])
                 .call()
     }

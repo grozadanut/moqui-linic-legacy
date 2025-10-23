@@ -6,7 +6,7 @@ import spock.lang.Specification
 import java.nio.file.Files
 import java.nio.file.Paths
 
-class ReceiveAnafInvoiceTests extends Specification {
+class ConsumeAnafInvoiceTests extends Specification {
     @Shared
     ExecutionContext ec
 
@@ -41,7 +41,7 @@ class ReceiveAnafInvoiceTests extends Specification {
         var rawXml = Files.readString(Paths.get("src", "test", "resources", "invoice.xml"))
 
         when:
-        ec.service.sync().name("AnafServices.receive#AnafInvoice")
+        ec.service.sync().name("AnafServices.consume#AnafInvoice")
                 .parameters([systemMessageId: "12345", messageDate: "2024-01-25",
                              messageText: rawXml])
                 .call()
@@ -69,7 +69,7 @@ class ReceiveAnafInvoiceTests extends Specification {
         var rawXml = Files.readString(Paths.get("src", "test", "resources", "credit_note.xml"))
 
         when:
-        ec.service.sync().name("AnafServices.receive#AnafInvoice")
+        ec.service.sync().name("AnafServices.consume#AnafInvoice")
                 .parameters([systemMessageId: "12346", messageDate: "2024-01-31",
                              messageText: rawXml])
                 .call()

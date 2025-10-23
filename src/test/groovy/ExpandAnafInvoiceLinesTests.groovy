@@ -38,7 +38,6 @@ class ExpandAnafInvoiceLinesTests extends Specification {
                 .parameters([systemMessageId: "EAILT_2"])
                 .call()
 
-
         ec.artifactExecution.enableAuthz()
         ec.transaction.commit()
     }
@@ -46,7 +45,7 @@ class ExpandAnafInvoiceLinesTests extends Specification {
     def "expand received invoice"() {
         setup:
         var rawXml = Files.readString(Paths.get("src", "test", "resources", "invoice.xml"))
-        ec.service.sync().name("AnafServices.receive#AnafInvoice")
+        ec.service.sync().name("AnafServices.consume#AnafInvoice")
                 .parameters([systemMessageId: "EAILT_1", messageDate: "2024-01-25",
                              messageText: rawXml])
                 .call()
@@ -71,7 +70,7 @@ class ExpandAnafInvoiceLinesTests extends Specification {
     def "expand received credit note"() {
         setup:
         var rawXml = Files.readString(Paths.get("src", "test", "resources", "credit_note.xml"))
-        ec.service.sync().name("AnafServices.receive#AnafInvoice")
+        ec.service.sync().name("AnafServices.consume#AnafInvoice")
                 .parameters([systemMessageId: "EAILT_2", messageDate: "2024-01-31",
                              messageText: rawXml])
                 .call()
