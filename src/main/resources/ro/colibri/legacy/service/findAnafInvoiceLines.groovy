@@ -2,6 +2,7 @@ package ro.colibri.legacy.service
 
 import org.moqui.context.ExecutionContext
 import org.moqui.util.MNode
+import ro.colibri.util.Utils
 
 ExecutionContext ec = context.ec
 
@@ -37,6 +38,6 @@ for (lineMsg in ec.getEntity().find("moqui.service.message.SystemMessage")
     var totalCurrency = lineNode.first("cbc:LineExtensionAmount").attribute("currencyID")
 
     resultList.add(["id": lineMsg.systemMessageId, "lineId": lineId, "name": name, "price": price,
-                    "priceCurrency": priceCurrency, "quantity": quantity, "uom": uom, "total": total,
-                    "totalCurrency": totalCurrency])
+                    "priceCurrency": priceCurrency, "quantity": quantity, "uom": Utils.UNECERec20ToUom(uom),
+                    "total": total, "totalCurrency": totalCurrency])
 }
