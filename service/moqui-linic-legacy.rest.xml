@@ -38,5 +38,8 @@ along with this software (see the LICENSE.md file). If not, see
     </resource>
     <resource name="anafInvoiceLines" description="Get Invoice lines from an ANAF eFactura invoice">
         <method type="get"><service name="AnafServices.find#AnafInvoiceLines"/></method>
+        <resource name="receive">
+            <method type="post"><service name="AnafServices.receive#AnafInvoiceLine"/></method>
+        </resource>
     </resource>
 </resource>

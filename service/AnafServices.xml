@@ -77,4 +77,18 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
         </actions>
     </service>
+
+    <service verb="receive" noun="AnafInvoiceLine" type="script"
+             location="classpath://ro/colibri/legacy/service/receiveAnafInvoiceLine.groovy">
+    <description>Marks the line message as SmsgConfirmed and updates product supplier id</description>
+    <in-parameters>
+        <parameter name="systemMessageId" required="true"/>
+        <parameter name="invoiceId"/>
+        <parameter name="supplierId"/>
+        <parameter name="productId"/>
+        <parameter name="facilityPartyId"/>
+        <parameter name="supplierProductId"/>
+        <parameter name="supplierProductName"/>
+    </in-parameters>
+    </service>
 </services>
