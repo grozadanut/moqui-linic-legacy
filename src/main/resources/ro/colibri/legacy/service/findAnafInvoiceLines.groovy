@@ -39,5 +39,5 @@ for (lineMsg in ec.getEntity().find("moqui.service.message.SystemMessage")
 
     resultList.add(["id": lineMsg.systemMessageId, "lineId": lineId, "name": name, "price": price,
                     "priceCurrency": priceCurrency, "quantity": quantity, "uom": Utils.UNECERec20ToUom(uom),
-                    "total": total, "totalCurrency": totalCurrency])
+                    "total": total, "totalCurrency": totalCurrency, "statusId": lineMsg.statusId])
 }
