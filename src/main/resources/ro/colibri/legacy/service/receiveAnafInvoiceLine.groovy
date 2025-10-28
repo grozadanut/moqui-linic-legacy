@@ -20,8 +20,7 @@ if (lineMsg.systemMessageTypeId != 'ANAFReceivedInvoiceLine') {
 }
 
 // Sistemul actualizeaza codul furnizorului pentru produsul respectiv
-if (supplierId != null && productId != null && facilityPartyId != null &&
-        supplierProductId != null) {
+if (supplierId != null && productId != null && facilityPartyId != null) {
     // create supplier and product on demand
     EntityValue prod = ec.getEntity().makeValue("mantle.product.Product")
     prod.set("productId", productId)

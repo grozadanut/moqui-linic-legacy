@@ -30,9 +30,30 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="systemMessageId" required="true"/>
         </in-parameters>
         <out-parameters>
-            <parameter name="resultList" type="List">
-            </parameter>
+            <parameter name="resultList" type="List"/>
         </out-parameters>
+    </service>
+    <service verb="find" noun="ProductBySupplierId">
+        <in-parameters>
+            <parameter name="vendorPartyId" required="true"/>
+            <parameter name="otherPartyItemId"/>
+            <parameter name="otherPartyItemName"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="resultList" type="List"/>
+        </out-parameters>
+        <actions>
+            <if condition="otherPartyItemId == null &amp;&amp; otherPartyItemName == null">
+                <return error="true" message="Please supply either otherPartyItemId or otherPartyItemName!"/></if>
+
+            <entity-find entity-name="mantle.product.ProductPrice" list="resultList">
+                <econdition field-name="vendorPartyId"/>
+                <econditions combine="or">
+                    <econdition field-name="otherPartyItemId" ignore-if-empty="true"/>
+                    <econdition field-name="otherPartyItemName" ignore-if-empty="true"/>
+                </econditions>
+            </entity-find>
+        </actions>
     </service>
 
     <service verb="consume" noun="AnafInvoice" type="script"
@@ -80,15 +101,15 @@ along with this software (see the LICENSE.md file). If not, see
 
     <service verb="receive" noun="AnafInvoiceLine" type="script"
              location="classpath://ro/colibri/legacy/service/receiveAnafInvoiceLine.groovy">
-    <description>Marks the line message as SmsgConfirmed and updates product supplier id</description>
-    <in-parameters>
-        <parameter name="systemMessageId" required="true"/>
-        <parameter name="invoiceId"/>
-        <parameter name="supplierId"/>
-        <parameter name="productId"/>
-        <parameter name="facilityPartyId"/>
-        <parameter name="supplierProductId"/>
-        <parameter name="supplierProductName"/>
-    </in-parameters>
+        <description>Marks the line message as SmsgConfirmed and updates product supplier id</description>
+        <in-parameters>
+            <parameter name="systemMessageId" required="true"/>
+            <parameter name="invoiceId"/>
+            <parameter name="supplierId"/>
+            <parameter name="productId"/>
+            <parameter name="facilityPartyId"/>
+            <parameter name="supplierProductId"/>
+            <parameter name="supplierProductName"/>
+        </in-parameters>
     </service>
 </services>

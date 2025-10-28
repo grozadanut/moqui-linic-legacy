@@ -26,6 +26,8 @@ for (lineMsg in ec.getEntity().find("moqui.service.message.SystemMessage")
         .list()) {
     MNode lineNode = MNode.parseText(null, lineMsg.messageText)
     var lineId = lineNode.first("cbc:ID").text
+    var itemId = lineNode.first("cac:Item").first("cac:SellersItemIdentification")
+            ?.first("cbc:ID")?.text
     var name = lineNode.first("cac:Item").first("cbc:Name").text
     var price = lineNode.first("cac:Price").first("cbc:PriceAmount").text
     var priceCurrency = lineNode.first("cac:Price").first("cbc:PriceAmount")
@@ -39,5 +41,5 @@ for (lineMsg in ec.getEntity().find("moqui.service.message.SystemMessage")
 
     resultList.add(["id": lineMsg.systemMessageId, "lineId": lineId, "name": name, "price": price,
                     "priceCurrency": priceCurrency, "quantity": quantity, "uom": Utils.UNECERec20ToUom(uom),
-                    "total": total, "totalCurrency": totalCurrency, "statusId": lineMsg.statusId])
+                    "total": total, "totalCurrency": totalCurrency, "statusId": lineMsg.statusId, "itemId": itemId])
 }
