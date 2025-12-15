@@ -86,8 +86,16 @@ along with this software (see the LICENSE.md file). If not, see
         </out-parameters>
     </service>
 
-    <!--Temporary, to be removed-->
-    <service verb="migrate" noun="ProductSuppliers" type="script"
-             location="classpath://ro/colibri/legacy/service/migrateProductSuppliers.groovy">
+    <service verb="set" noun="ProductFacility" type="script"
+             location="classpath://ro/colibri/legacy/service/setProductFacility.groovy">
+        <in-parameters>
+            <parameter name="items" type="List">
+                <parameter name="item" type="Map">
+                    <parameter name="productId" required="true"/>
+                    <parameter name="facilityId" required="true"/>
+                    <parameter name="minimumStock"/>
+                </parameter>
+            </parameter>
+        </in-parameters>
     </service>
 </services>
