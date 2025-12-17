@@ -89,6 +89,7 @@ test {
 
     dependsOn cleanTest
     include '**/LegacySuite.class'
+    include '**/*Tests.class'
 
     systemProperty 'moqui.runtime', moquiDir.absolutePath + '/runtime'
     systemProperty 'moqui.conf', 'conf/MoquiDevConf.xml'
