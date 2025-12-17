@@ -24,7 +24,6 @@ for (i in items) {
     EntityValue prod = ec.getEntity().makeValue("Product")
     prod.set("productId", i.productId)
     prod.set("productTypeEnumId", "PtAsset")
-    prod.set("productTypeEnumId", "PtAsset")
     prod.set("assetTypeEnumId", "AstTpInventory")
     prod.set("assetClassEnumId", "AsClsInventoryFin")
     prod.createOrUpdate()
