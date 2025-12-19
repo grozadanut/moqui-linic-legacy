@@ -386,4 +386,74 @@ class FindProductSuppliersTests extends Specification {
                 .parameters([partyId: "FPST-Party-6"])
                 .call()
     }
+
+    def "dont return sale price, only purchase price"() {
+        given:
+        ec.service.sync().name("store#Party")
+                .parameters([partyId: "FPST-Party-7", partyTypeEnumId: "PtyOrganization"])
+                .call()
+        ec.service.sync().name("store#Organization")
+                .parameters([partyId: "FPST-Party-7", organizationName: "Test party"])
+                .call()
+        ec.service.sync().name("store#Facility")
+                .parameters([facilityId: "FPST-Party-7", facilityTypeEnumId: "FcTpWarehouse",
+                             ownerPartyId: "FPST-Party-7"])
+                .call()
+
+        ec.service.sync().name("store#Product")
+                .parameters([productId: "FPST-P-7"])
+                .call()
+        ec.service.sync().name("store#ProductPrice")
+                .parameters([productPriceId: "FPST-PP-7", productId: "FPST-P-7",
+                             vendorPartyId: "L1", customerPartyId: "FPST-Party-7",
+                             priceTypeEnumId: "PptCurrent", pricePurposeEnumId: "PppPurchase"])
+                .call()
+        ec.service.sync().name("store#ProductPrice")
+                .parameters([productPriceId: "FPST-PP-7-2", productId: "FPST-P-7",
+                             priceTypeEnumId: "PptCurrent", pricePurposeEnumId: "PppPurchase"])
+                .call()
+        ec.service.sync().name("store#ProductFacility")
+                .parameters([productId: "FPST-P-7",
+                             facilityId: "FPST-Party-7", minimumStock: "7"])
+                .call()
+
+        expect:
+        List result = ec.service.sync()
+                .name("LegacyServices.find#ProductSuppliers")
+                .parameters([organizationPartyId: "FPST-Party-7"])
+                .call()
+                .get("resultList")
+
+        result.size() == 1
+        with ((Map) result.get(0)) {
+            get("productPriceId") == "FPST-PP-7"
+            get("productId") == "FPST-P-7"
+            get("supplierId") == "L1"
+            get("supplierName") == "Linic"
+            get("minimumStock").toString() == "7"
+        }
+
+        cleanup:
+        ec.service.sync().name("delete#ProductFacility")
+                .parameters([productId: "FPST-P-7", facilityId: "FPST-Party-7"])
+                .call()
+        ec.service.sync().name("delete#ProductPrice")
+                .parameters([productPriceId: "FPST-PP-7"])
+                .call()
+        ec.service.sync().name("delete#ProductPrice")
+                .parameters([productPriceId: "FPST-PP-7-2"])
+                .call()
+        ec.service.sync().name("delete#Product")
+                .parameters([productId: "FPST-P-7"])
+                .call()
+        ec.service.sync().name("delete#Facility")
+                .parameters([facilityId: "FPST-Party-7"])
+                .call()
+        ec.service.sync().name("delete#Organization")
+                .parameters([partyId: "FPST-Party-7"])
+                .call()
+        ec.service.sync().name("delete#Party")
+                .parameters([partyId: "FPST-Party-7"])
+                .call()
+    }
 }

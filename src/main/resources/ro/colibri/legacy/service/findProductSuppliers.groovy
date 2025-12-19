@@ -33,16 +33,16 @@ dv.addAlias("PCM", "pareto", "productCategoryId", null)
 
 ef.condition("productId", EntityCondition.IS_NOT_NULL, null)
 ef.condition(ec.entity.conditionFactory.makeCondition(
-        [ec.entity.conditionFactory.makeCondition("customerPartyId", EntityCondition.EQUALS, null),
+        [ec.entity.conditionFactory.makeCondition("productPriceId", EntityCondition.EQUALS, null),
          ec.entity.conditionFactory.makeCondition("customerPartyId", EntityCondition.EQUALS, organizationPartyId)],
         EntityCondition.OR))
 
 ef.condition(ec.entity.conditionFactory.makeCondition(
-        [ec.entity.conditionFactory.makeCondition("priceTypeEnumId", EntityCondition.EQUALS, null),
+        [ec.entity.conditionFactory.makeCondition("productPriceId", EntityCondition.EQUALS, null),
          ec.entity.conditionFactory.makeCondition("priceTypeEnumId", EntityCondition.EQUALS, "PptCurrent")],
         EntityCondition.OR))
 ef.condition(ec.entity.conditionFactory.makeCondition(
-        [ec.entity.conditionFactory.makeCondition("pricePurposeEnumId", EntityCondition.EQUALS, null),
+        [ec.entity.conditionFactory.makeCondition("productPriceId", EntityCondition.EQUALS, null),
          ec.entity.conditionFactory.makeCondition("pricePurposeEnumId", EntityCondition.EQUALS, "PppPurchase")],
         EntityCondition.OR))
 
