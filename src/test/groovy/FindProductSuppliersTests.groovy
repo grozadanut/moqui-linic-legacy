@@ -456,4 +456,66 @@ class FindProductSuppliersTests extends Specification {
                 .parameters([partyId: "FPST-Party-7"])
                 .call()
     }
+
+    def "should return min stock when supplier pricing is for another facility"() {
+        given:
+        ec.service.sync().name("store#Party")
+                .parameters([partyId: "FPST-Party-8", partyTypeEnumId: "PtyOrganization"])
+                .call()
+        ec.service.sync().name("store#Organization")
+                .parameters([partyId: "FPST-Party-8", organizationName: "Test party"])
+                .call()
+        ec.service.sync().name("store#Facility")
+                .parameters([facilityId: "FPST-Party-8", facilityTypeEnumId: "FcTpWarehouse",
+                             ownerPartyId: "FPST-Party-8"])
+                .call()
+
+        ec.service.sync().name("store#Product")
+                .parameters([productId: "FPST-P-8"])
+                .call()
+        ec.service.sync().name("store#ProductPrice")
+                .parameters([productPriceId: "FPST-PP-8", productId: "FPST-P-8",
+                             vendorPartyId: "L2", customerPartyId: "L1",
+                             priceTypeEnumId: "PptCurrent", pricePurposeEnumId: "PppPurchase"])
+                .call()
+        ec.service.sync().name("store#ProductFacility")
+                .parameters([productId: "FPST-P-8",
+                             facilityId: "FPST-Party-8", minimumStock: "8"])
+                .call()
+
+        expect:
+        List result = ec.service.sync()
+                .name("LegacyServices.find#ProductSuppliers")
+                .parameters([organizationPartyId: "FPST-Party-8"])
+                .call()
+                .get("resultList")
+
+        with ((Map) result.get(0)) {
+            get("productPriceId") == null
+            get("productId") == "FPST-P-8"
+            get("supplierId") == null
+            get("supplierName") == null
+            get("minimumStock").toString() == "8"
+        }
+
+        cleanup:
+        ec.service.sync().name("delete#ProductFacility")
+                .parameters([productId: "FPST-P-8", facilityId: "FPST-Party-8"])
+                .call()
+        ec.service.sync().name("delete#ProductPrice")
+                .parameters([productPriceId: "FPST-PP-8"])
+                .call()
+        ec.service.sync().name("delete#Product")
+                .parameters([productId: "FPST-P-8"])
+                .call()
+        ec.service.sync().name("delete#Facility")
+                .parameters([facilityId: "FPST-Party-8"])
+                .call()
+        ec.service.sync().name("delete#Organization")
+                .parameters([partyId: "FPST-Party-8"])
+                .call()
+        ec.service.sync().name("delete#Party")
+                .parameters([partyId: "FPST-Party-8"])
+                .call()
+    }
 }
