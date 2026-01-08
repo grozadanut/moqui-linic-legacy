@@ -171,7 +171,7 @@ public class LegacySyncServices {
                 final EntityValue categoryMember = ec.getEntity().makeValue("ProductCategoryMember");
                 categoryMember.set("productId", productId);
                 categoryMember.set("productCategoryId", "L2" + paretoCat);
-                categoryMember.set("fromDate", Timestamp.valueOf(LocalDateTime.of(2025, 1, 1, 0, 0)));
+                categoryMember.set("fromDate", Timestamp.valueOf(LocalDateTime.of(2026, 1, 1, 0, 0)));
                 categoryMember.createOrUpdate();
             }
         } catch (final IOException e) {
