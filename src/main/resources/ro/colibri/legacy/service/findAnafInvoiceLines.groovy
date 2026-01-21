@@ -28,7 +28,8 @@ for (lineMsg in ec.getEntity().find("moqui.service.message.SystemMessage")
     var lineId = lineNode.first("cbc:ID").text
     var itemId = lineNode.first("cac:Item").first("cac:SellersItemIdentification")
             ?.first("cbc:ID")?.text
-    var name = lineNode.first("cac:Item").first("cbc:Name").text
+    var name = lineNode.first("cac:Item").first("cbc:Name").text + " " +
+            lineNode.first("cac:Item").first("cbc:Description")?.text
     var price = lineNode.first("cac:Price").first("cbc:PriceAmount").text
     var priceCurrency = lineNode.first("cac:Price").first("cbc:PriceAmount")
             .attribute("currencyID")
