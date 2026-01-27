@@ -1,5 +1,6 @@
 package ro.colibri.legacy.service;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.fileupload.disk.DiskFileItem;
@@ -8,9 +9,9 @@ import org.moqui.entity.EntityValue;
 import org.moqui.service.ServiceException;
 import ro.colibri.beans.VanzariBean;
 import ro.colibri.beans.VanzariBeanRemote;
+import ro.colibri.entities.comercial.Operatiune;
 import ro.colibri.entities.comercial.Partner;
 import ro.colibri.entities.comercial.Product;
-import ro.colibri.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,6 +20,8 @@ import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.Map;
+
+import static ro.colibri.util.StringUtils.isEmpty;
 
 public class LegacySyncServices {
     public static Map<String, Object> syncAllProducts(ExecutionContext ec) {
@@ -115,7 +118,7 @@ public class LegacySyncServices {
         final VanzariBeanRemote bean = ServiceLocator.getBusinessService(VanzariBean.class, VanzariBeanRemote.class);
 
         for (final Partner legacyP : bean.allPartners()) {
-            boolean isPerson = StringUtils.isEmpty(legacyP.getCodFiscal());
+            boolean isPerson = isEmpty(legacyP.getCodFiscal());
 
             final EntityValue party = ec.getEntity().makeValue("Party");
             final String legacyId = legacyP.getId() + "";
@@ -192,7 +195,7 @@ public class LegacySyncServices {
                 final String barcode = rec.get(0);
                 final String supplierName = rec.get(5);
 
-                if (StringUtils.isEmpty(supplierName))
+                if (isEmpty(supplierName))
                     continue;
 
                 EntityValue productIden = ec.getEntity().find("ProductIdentification")
@@ -260,5 +263,15 @@ public class LegacySyncServices {
 
         fileBytes.delete();
         return Map.of();
+    }
+
+    public static Product productById(final Integer id) {
+        final VanzariBeanRemote commercialBean = ServiceLocator.getBusinessService(VanzariBean.class, VanzariBeanRemote.class);
+        return commercialBean.productById(id);
+    }
+
+    public static ImmutableList<Product> convertToProducts(final ImmutableList<Operatiune> ops) {
+        final VanzariBeanRemote bean = ServiceLocator.getBusinessService(VanzariBean.class, VanzariBeanRemote.class);
+        return bean.convertToProducts(ops);
     }
 }

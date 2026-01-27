@@ -2,6 +2,7 @@
         default-menu-title="Dashboard" default-menu-index="1">
 
     <actions>
+        <set field="facilityId" from="facilityId ?: ec.user.getPreference('FacilityActive') ?: ec.user.getPreference('FacilityGeneralDefault')"/>
         <set field="pageSize" from="pageSize ?: 60"/>
         <set field="productList" from="ec.service.sync().name('UIServices.searchProduct').parameters(ec.context).call().productList"/>
         <script>paginateList("productList", null, context)</script>
@@ -34,10 +35,26 @@
                 <default-field><display also-hidden="false"/></default-field>
             </field>
 
+            <field name="priceNicename">
+                <header-field title="Price" show-order-by="true"/>
+                <default-field><display also-hidden="false"/></default-field>
+            </field>
+
+            <field name="stockL1">
+                <header-field title="Stoc L1" show-order-by="true"/>
+                <default-field><display also-hidden="false"/></default-field>
+            </field>
+            <field name="stockL2">
+                <header-field title="Stoc L2" show-order-by="true"/>
+                <default-field><display also-hidden="false"/></default-field>
+            </field>
+
             <form-list-column><field-ref name="pseudoId"/><field-ref name="prodIdents"/></form-list-column>
             <form-list-column><field-ref name="productName"/></form-list-column>
+            <form-list-column><field-ref name="priceNicename"/></form-list-column>
+            <form-list-column><field-ref name="stockL1"/></form-list-column>
+            <form-list-column><field-ref name="stockL2"/></form-list-column>
         </form-list>
-
     </widgets>
 
 </screen>
