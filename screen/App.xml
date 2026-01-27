@@ -16,24 +16,6 @@ along with this software (see the LICENSE.md file). If not, see
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
         include-child-content="true" menu-image="fa fa-flash" menu-image-type="icon">
 
-    <transition name="uploadPareto">
-        <service-call name="LegacyServices.legacyImport#ProductPareto"/>
-        <default-response url="."/>
-    </transition>
-
-    <transition name="uploadProductSupplier">
-        <service-call name="LegacyServices.legacyImport#ProductSupplier"/>
-        <default-response url="."/>
-    </transition>
-
-    <widgets>
-        <form-single name="UploadParetoForm" transition="uploadPareto">
-            <field name="uploadedFile"><default-field title="Pareto File"><file/></default-field></field>
-            <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
-        </form-single>
-        <form-single name="UploadProductSupplierForm" transition="uploadProductSupplier">
-            <field name="uploadedFile"><default-field title="Product Supplier File"><file/></default-field></field>
-            <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
-        </form-single>
-    </widgets>
+    <subscreens default-item="dashboard"/>
+    <widgets><subscreens-panel id="LegacyPanel" type="popup"/></widgets>
 </screen>

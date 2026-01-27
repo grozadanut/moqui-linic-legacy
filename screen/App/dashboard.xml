@@ -1,0 +1,43 @@
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-title="Dashboard" default-menu-index="1">
+
+    <actions>
+        <set field="pageSize" from="pageSize ?: 60"/>
+        <set field="productList" from="ec.service.sync().name('UIServices.searchProduct').parameters(ec.context).call().productList"/>
+        <script>paginateList("productList", null, context)</script>
+    </actions>
+
+    <widgets>
+        <form-single name="SearchForm" transition="." focus-field="lookupId">
+            <field name="lookupId"><default-field title=""><text-line/></default-field></field>
+            <field name="submitButton"><default-field title="Cauta"><submit/></default-field></field>
+            <field-layout><field-row-big><field-ref name="lookupId"/><field-ref name="submitButton"/></field-row-big></field-layout>
+        </form-single>
+
+        <form-list name="ProductList" list="productList" skip-form="true">
+            <row-actions>
+                <entity-find entity-name="mantle.product.ProductIdentification" list="prodIdentList">
+                    <econdition field-name="productId"/><order-by field-name="productIdTypeEnumId"/></entity-find>
+            </row-actions>
+            <field name="pseudoId">
+                <header-field title="ID" show-order-by="case-insensitive"/>
+                <default-field><display also-hidden="false"/></default-field>
+            </field>
+            <field name="prodIdents"><default-field title="Other IDs">
+                <section-iterate name="OtherProductIdSection" list="prodIdentList" entry="prodIdent"><widgets>
+                    <label text="${prodIdent.idValue} (${prodIdent.type?.description ?: ''})" type="div"/>
+                </widgets></section-iterate>
+            </default-field></field>
+
+            <field name="productName">
+                <header-field title="Name" show-order-by="case-insensitive"/>
+                <default-field><display also-hidden="false"/></default-field>
+            </field>
+
+            <form-list-column><field-ref name="pseudoId"/><field-ref name="prodIdents"/></form-list-column>
+            <form-list-column><field-ref name="productName"/></form-list-column>
+        </form-list>
+
+    </widgets>
+
+</screen>
