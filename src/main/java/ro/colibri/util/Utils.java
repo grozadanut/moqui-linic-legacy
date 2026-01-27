@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -122,5 +124,15 @@ public class Utils {
             });
             return map;
         });
+    }
+
+    public static String extractTileName(String productName) {
+        if (productName == null)
+            return null;
+        Pattern pattern = Pattern.compile("^\\S+\\s+([^0-9]+)");
+        Matcher matcher = pattern.matcher(productName);
+        if (matcher.find())
+            return matcher.group(1).trim();
+        return productName.trim();
     }
 }

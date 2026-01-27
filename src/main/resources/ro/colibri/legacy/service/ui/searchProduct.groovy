@@ -35,5 +35,20 @@ for (var entity in ec.entity.find("mantle.product.ProductFindView")
     p.put("stockL1", stocuri.find { it.gestiune.importName.equals("L1")}?.stoc + " " + legacyProduct?.uom)
     p.put("stockL2", stocuri.find { it.gestiune.importName.equals("L2")}?.stoc + " " + legacyProduct?.uom)
 
+    if (lookupId) {
+        var supplierPrice = ec.entity.find("mantle.product.ProductPrice")
+                .condition("productId", p.productId)
+                .condition("customerPartyId", facilityId)
+                .condition("preferredOrderEnumId", "SpoMain")
+                .one()
+
+        var supplierName = supplierPrice ? ec.entity.find("mantle.party.Organization")
+                .condition("partyId", supplierPrice.vendorPartyId)
+                .one() : null
+
+        if (supplierName?.organizationName?.equals("DUNCA CONSTRUCT SRL"))
+            tileName = ro.colibri.util.Utils.extractTileName(p.productName)
+    }
+
     productList.add(p)
 }

@@ -18,10 +18,12 @@ along with this software (see the LICENSE.md file). If not, see
     <service verb="search" noun="Product" type="script"
              location="classpath://ro/colibri/legacy/service/ui/searchProduct.groovy">
         <in-parameters>
+            <parameter name="facilityId" required="true"/>
             <parameter name="lookupId"/>
         </in-parameters>
         <out-parameters>
             <parameter name="productList" type="List"/>
+            <parameter name="tileName"/>
         </out-parameters>
     </service>
 
