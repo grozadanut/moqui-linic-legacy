@@ -2,12 +2,16 @@
         default-menu-title="Dashboard" default-menu-index="1">
 
     <actions>
-        <set field="facilityId" from="facilityId ?: ec.user.getPreference('FacilityActive') ?: ec.user.getPreference('FacilityGeneralDefault')"/>
-        <set field="pageSize" from="pageSize ?: 60"/>
-        <set field="result" from="ec.service.sync().name('UIServices.searchProduct').parameters(ec.context).call()"/>
-        <set field="productList" from="result.productList"/>
-        <set field="tileName" from="result.tileName"/>
-        <script>paginateList("productList", null, context)</script>
+        <if condition="lookupId">
+            <set field="facilityId" from="facilityId ?: ec.user.getPreference('FacilityActive') ?: ec.user.getPreference('FacilityGeneralDefault')"/>
+            <service-call name="UIServices.searchProduct" in-map="true" out-map="context"/>
+            <script>paginateList("productList", null, context)</script>
+        </if>
+        <if condition="tileName">
+            <service-call name="UIServices.scrapeDuncaTileInfo" in-map="true" out-map="context"/>
+            <set field="scrapedList" from="response"/>
+            <script>paginateList("scrapedList", null, context)</script>
+        </if>
     </actions>
 
     <widgets>
@@ -65,6 +69,26 @@
             <form-list-column><field-ref name="priceNicename"/></form-list-column>
             <form-list-column><field-ref name="stockL1"/></form-list-column>
             <form-list-column><field-ref name="stockL2"/></form-list-column>
+        </form-list>
+
+        <form-list name="ScrapedList" list="scrapedList" skip-form="true">
+            <field name="name">
+                <header-field title="Name" show-order-by="case-insensitive"/>
+                <default-field><display/></default-field>
+            </field>
+
+            <field name="oradea">
+                <header-field title="Stoc Oradea" show-order-by="true"/>
+                <default-field><display/></default-field>
+            </field>
+            <field name="bucuresti">
+                <header-field title="Stoc Bucuresti" show-order-by="true"/>
+                <default-field><display/></default-field>
+            </field>
+            <field name="iasi">
+                <header-field title="Stoc Iasi" show-order-by="true"/>
+                <default-field><display/></default-field>
+            </field>
         </form-list>
     </widgets>
 

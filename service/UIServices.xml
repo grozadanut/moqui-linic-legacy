@@ -14,7 +14,6 @@ along with this software (see the LICENSE.md file). If not, see
 -->
 <services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-3.xsd">
 
-    <!-- moqui-linic-legacy & Related Services -->
     <service verb="search" noun="Product" type="script"
              location="classpath://ro/colibri/legacy/service/ui/searchProduct.groovy">
         <in-parameters>
@@ -24,6 +23,21 @@ along with this software (see the LICENSE.md file). If not, see
         <out-parameters>
             <parameter name="productList" type="List"/>
             <parameter name="tileName"/>
+        </out-parameters>
+    </service>
+    
+    <service verb="scrape" noun="DuncaTileInfo" type="remote-rest"
+             method="GET" location="http://localhost:8086/scrape/${URLEncoder.encode(tileName, 'UTF-8')}">
+        <in-parameters>
+            <parameter name="tileName" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="response" type="List">
+                <parameter name="name"/>
+                <parameter name="oradea"/>
+                <parameter name="bucuresti"/>
+                <parameter name="iasi"/>
+            </parameter>
         </out-parameters>
     </service>
 

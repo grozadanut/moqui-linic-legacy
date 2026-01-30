@@ -52,3 +52,5 @@ for (var entity in ec.entity.find("mantle.product.ProductFindView")
 
     productList.add(p)
 }
+
+return [productList: productList, tileName: tileName]
