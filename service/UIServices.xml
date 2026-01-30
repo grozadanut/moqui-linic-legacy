@@ -27,7 +27,7 @@ along with this software (see the LICENSE.md file). If not, see
     </service>
     
     <service verb="scrape" noun="DuncaTileInfo" type="remote-rest"
-             method="GET" location="http://localhost:8086/scrape/${URLEncoder.encode(tileName, 'UTF-8')}">
+             method="GET" location="${System.getProperty('SCRAPE_URL')}/${URLEncoder.encode(tileName, 'UTF-8')}">
         <in-parameters>
             <parameter name="tileName" required="true"/>
         </in-parameters>
