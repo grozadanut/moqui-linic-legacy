@@ -1,4 +1,4 @@
-package ro.colibri.legacy.service
+package ro.colibri.legacy.service.ui
 
 import org.moqui.context.ExecutionContext
 import org.moqui.entity.EntityCondition
