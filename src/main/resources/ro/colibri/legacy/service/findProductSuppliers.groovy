@@ -2,6 +2,7 @@ package ro.colibri.legacy.service
 
 import org.moqui.context.ExecutionContext
 import org.moqui.entity.EntityCondition
+import org.moqui.entity.EntityDynamicView
 import org.moqui.entity.EntityFind
 import ro.colibri.util.Utils
 
@@ -53,3 +54,15 @@ EntityFind efFacility = ec.entity.find("ProductFacility").distinct(true)
 efFacility.condition("facilityId", EntityCondition.EQUALS, organizationPartyId)
 efFacility.selectFields(["productId", "minimumStock"])
 Utils.addOrUpdate(resultList, efFacility.list(), "productId")
+
+EntityFind efRequirement = ec.entity.find("Requirement").distinct(true)
+EntityDynamicView dvRequirement = efRequirement.makeEntityDynamicView()
+dvRequirement.addMemberEntity("R", "Requirement", null, null, null)
+dvRequirement.addAlias("R", "facilityId")
+dvRequirement.addAlias("R", "requirementTypeEnumId")
+dvRequirement.addAlias("R", "productId")
+dvRequirement.addAlias("R", "requiredQuantityTotal", "quantity", "sum")
+efRequirement.condition("facilityId", organizationPartyId)
+efRequirement.condition("requirementTypeEnumId", "RqTpInventory")
+efRequirement.selectFields(["productId", "requiredQuantityTotal"])
+Utils.addOrUpdate(resultList, efRequirement.list(), "productId")

@@ -518,4 +518,83 @@ class FindProductSuppliersTests extends Specification {
                 .parameters([partyId: "FPST-Party-8"])
                 .call()
     }
+
+    def "should sum totals when requirements exist"() {
+        given:
+        ec.service.sync().name("store#Party")
+                .parameters([partyId: "FPST-Party-9", partyTypeEnumId: "PtyOrganization"])
+                .call()
+        ec.service.sync().name("store#Organization")
+                .parameters([partyId: "FPST-Party-9", organizationName: "Test party"])
+                .call()
+        ec.service.sync().name("store#Facility")
+                .parameters([facilityId: "FPST-Party-9", facilityTypeEnumId: "FcTpWarehouse",
+                             ownerPartyId: "FPST-Party-9"])
+                .call()
+
+        ec.service.sync().name("store#Product")
+                .parameters([productId: "FPST-P-9", productName: "Only requirements"])
+                .call()
+        ec.service.sync().name("store#Requirement")
+                .parameters([requirementId: "FPST-REQ-9-1", requirementTypeEnumId: "RqTpInventory", statusId: "RqmtStProposed",
+                             facilityId: "FPST-Party-9", productId:"FPST-P-9", quantity: "1"])
+                .call()
+        ec.service.sync().name("store#Requirement")
+                .parameters([requirementId: "FPST-REQ-9-2", requirementTypeEnumId: "RqTpInventory", statusId: "RqmtStCreated",
+                             facilityId: "FPST-Party-9", productId:"FPST-P-9", quantity: "10"])
+                .call()
+        ec.service.sync().name("store#Requirement")
+                .parameters([requirementId: "FPST-REQ-9-3", requirementTypeEnumId: "RqTpInventory", statusId: "RqmtStApproved",
+                             facilityId: "FPST-Party-9", productId:"FPST-P-9", quantity: "100"])
+                .call()
+        ec.service.sync().name("store#Requirement")
+                .parameters([requirementId: "FPST-REQ-9-4", requirementTypeEnumId: "RqTpInventory", statusId: "RqmtStOrdered",
+                             facilityId: "FPST-Party-9", productId:"FPST-P-9", quantity: "1000"])
+                .call()
+        ec.service.sync().name("store#Requirement")
+                .parameters([requirementId: "FPST-REQ-9-IGNORE", requirementTypeEnumId: "RqTpInventory", statusId: "RqmtStOrdered",
+                             facilityId: "L2", productId:"FPST-P-9", quantity: "5"])
+                .call()
+
+        expect:
+        List result = ec.service.sync()
+                .name("LegacyServices.find#ProductSuppliers")
+                .parameters([organizationPartyId: "FPST-Party-9"])
+                .call()
+                .get("resultList")
+
+        with ((Map) result.get(0)) {
+            get("productId") == "FPST-P-9"
+            get("requiredQuantityTotal").toString() == "1111"
+        }
+
+        cleanup:
+        ec.service.sync().name("delete#Requirement")
+                .parameters([requirementId: "FPST-REQ-9-1"])
+                .call()
+        ec.service.sync().name("delete#Requirement")
+                .parameters([requirementId: "FPST-REQ-9-2"])
+                .call()
+        ec.service.sync().name("delete#Requirement")
+                .parameters([requirementId: "FPST-REQ-9-3"])
+                .call()
+        ec.service.sync().name("delete#Requirement")
+                .parameters([requirementId: "FPST-REQ-9-4"])
+                .call()
+        ec.service.sync().name("delete#Requirement")
+                .parameters([requirementId: "FPST-REQ-9-IGNORE"])
+                .call()
+        ec.service.sync().name("delete#Product")
+                .parameters([productId: "FPST-P-9"])
+                .call()
+        ec.service.sync().name("delete#Facility")
+                .parameters([facilityId: "FPST-Party-9"])
+                .call()
+        ec.service.sync().name("delete#Organization")
+                .parameters([partyId: "FPST-Party-9"])
+                .call()
+        ec.service.sync().name("delete#Party")
+                .parameters([partyId: "FPST-Party-9"])
+                .call()
+    }
 }
