@@ -31,6 +31,7 @@ along with this software (see the LICENSE.md file). If not, see
     <resource name="requirements" description="Product requirements">
         <method type="post"><service name="UIServices.create#Requirement"/></method>
         <method type="get"><service name="UIServices.find#Requirements"/></method>
+        <method type="delete"><service name="UIServices.delete#Requirement"/></method>
     </resource>
 
     <resource name="suppliers" description="Get the list of current registered suppliers">
