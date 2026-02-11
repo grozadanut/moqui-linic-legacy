@@ -72,4 +72,14 @@ along with this software (see the LICENSE.md file). If not, see
             <service-call name="delete#mantle.request.requirement.Requirement" in-map="context"/>
         </actions>
     </service>
+
+    <service verb="find" noun="OrderChannels" type="script"
+             location="classpath://ro/colibri/legacy/service/ui/findOrderChannels.groovy">
+        <in-parameters>
+            <parameter name="supplierId" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="resultList" type="List"/>
+        </out-parameters>
+    </service>
 </services>
