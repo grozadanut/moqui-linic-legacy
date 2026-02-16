@@ -32,6 +32,9 @@ along with this software (see the LICENSE.md file). If not, see
         <method type="post"><service name="UIServices.create#Requirement"/></method>
         <method type="get"><service name="UIServices.find#Requirements"/></method>
         <method type="delete"><service name="UIServices.delete#Requirement"/></method>
+        <resource name="status">
+            <method type="put"><service name="UIServices.statusTo#Requirement"/></method>
+        </resource>
     </resource>
     <resource name="orderChannels" description="Product ordering - supplier channels">
         <method type="get"><service name="UIServices.find#OrderChannels"/></method>

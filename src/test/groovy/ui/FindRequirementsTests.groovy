@@ -76,7 +76,7 @@ class FindRequirementsTests extends Specification {
 
         with ((Map) result.get(0)) {
             get("productId") == "FRT-P-1"
-            get("requiredQuantityTotal").toString() == "12"
+            get("quantityTotal").toString() == "12"
         }
 
         cleanup:
@@ -161,7 +161,7 @@ class FindRequirementsTests extends Specification {
         result.size() == 1
         with ((Map) result.get(0)) {
             get("productId") == "FRT-P-2"
-            get("requiredQuantityTotal").toString() == "2"
+            get("quantityTotal").toString() == "2"
             get("supplierNames").toString() == "Linic(10), Colibri(20), Linic(25)"
         }
 

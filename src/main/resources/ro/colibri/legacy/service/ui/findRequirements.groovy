@@ -16,7 +16,8 @@ dvRequirement.addAlias("R", "facilityId")
 dvRequirement.addAlias("R", "requirementTypeEnumId")
 dvRequirement.addAlias("R", "productId")
 dvRequirement.addAlias("R", "statusId")
-dvRequirement.addAlias("R", "requiredQuantityTotal", "quantity", "sum")
+dvRequirement.addAlias("R", "description")
+dvRequirement.addAlias("R", "quantityTotal", "quantity", "sum")
 dvRequirement.addAlias("PP", "customerPartyId")
 dvRequirement.addAlias("PP", "priceTypeEnumId")
 dvRequirement.addAlias("PP", "pricePurposeEnumId")
@@ -34,13 +35,14 @@ efRequirement.condition(ec.entity.conditionFactory.makeCondition(
 efRequirement.condition(ec.entity.conditionFactory.makeCondition(
         "customerPartyId", EntityCondition.EQUALS, facilityId, true))
 
-efRequirement.selectFields(["productId", "requiredQuantityTotal", "supplierName", "price", "preferredOrderEnumId"])
-resultList = efRequirement.list().groupBy { [productId:it.productId, requiredQuantityTotal:it.requiredQuantityTotal] }
+efRequirement.selectFields(["productId", "quantityTotal", "supplierName", "price", "preferredOrderEnumId", "description"])
+resultList = efRequirement.list().groupBy { [productId:it.productId, quantityTotal:it.quantityTotal] }
         .collect { k, v ->
             [productId:k.productId,
-             requiredQuantityTotal:k.requiredQuantityTotal,
+             quantityTotal:k.quantityTotal,
              supplierNames:v.sort { it.preferredOrderEnumId}
                      .sort {it.price}
                      .collect { it.supplierName+"("+it.price+")" }
-                     .join(", ")]
+                     .join(", "),
+             description: v[0].description]
         }

@@ -12,7 +12,8 @@ You should have received a copy of the CC0 Public Domain Dedication
 along with this software (see the LICENSE.md file). If not, see
 <http://creativecommons.org/publicdomain/zero/1.0/>.
 -->
-<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-3.xsd">
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-3.xsd">
 
     <service verb="search" noun="Product" type="script"
              location="classpath://ro/colibri/legacy/service/ui/searchProduct.groovy">
@@ -25,7 +26,7 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="tileName"/>
         </out-parameters>
     </service>
-    
+
     <service verb="scrape" noun="DuncaTileInfo" type="remote-rest"
              method="GET" location="${System.getProperty('SCRAPE_URL')}/${URLEncoder.encode(tileName, 'UTF-8')}">
         <in-parameters>
@@ -48,6 +49,30 @@ along with this software (see the LICENSE.md file). If not, see
         <out-parameters>
             <parameter name="requirementId"/>
         </out-parameters>
+    </service>
+
+    <service verb="statusTo" noun="Requirement">
+        <in-parameters>
+            <auto-parameters/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="requirements"/>
+        </out-parameters>
+        <actions>
+            <entity-find entity-name="mantle.request.requirement.Requirement" list="requirements" for-update="true">
+                <econdition field-name="requirementId" ignore-if-empty="true"/>
+                <econdition field-name="requirementTypeEnumId" ignore-if-empty="true"/>
+                <econdition field-name="facilityId" ignore-if-empty="true"/>
+                <econdition field-name="deliverableId" ignore-if-empty="true"/>
+                <econdition field-name="assetId" ignore-if-empty="true"/>
+                <econdition field-name="productId" ignore-if-empty="true"/>
+            </entity-find>
+            <iterate list="requirements" entry="req">
+                <set field="req.statusId" from="statusId"/>
+                <set field="req.description" from="description"/>
+                <entity-update value-field="req"/>
+            </iterate>
+        </actions>
     </service>
 
     <service verb="find" noun="Requirements" type="script"
