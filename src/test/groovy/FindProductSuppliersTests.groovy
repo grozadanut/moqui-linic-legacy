@@ -565,7 +565,7 @@ class FindProductSuppliersTests extends Specification {
 
         with ((Map) result.get(0)) {
             get("productId") == "FPST-P-9"
-            get("requiredQuantityTotal").toString() == "1111"
+            get("quantityTotal").toString() == "1111"
         }
 
         cleanup:
