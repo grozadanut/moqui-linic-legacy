@@ -11,13 +11,13 @@ ef.condition("partyId", supplierId)
 ef.condition("contactMechPurposeId", "PhoneShippingOrigin")
 
 resultList = []
-resultList.add([Printeaza: "print"])
+resultList.add([channelId: "print", channelName: "Printeaza"])
 for (tel in ef.list()) {
-    resultList.add([WhatsApp: "+"+tel.countryCode+tel.contactNumber])
+    resultList.add([channelId: "whatsapp", channelName: "WhatsApp", phone: "+"+tel.countryCode+tel.contactNumber])
 }
 
 if (ec.entity.find("mantle.party.PartyRole")
         .condition("partyId", supplierId)
         .condition("roleTypeId", "OrgInternal")
         .one() != null)
-    resultList.add([Transfera: "transfer"])
+    resultList.add([channelId: "transfer", channelName: "Transfera"])
