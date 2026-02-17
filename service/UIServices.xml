@@ -107,4 +107,29 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="resultList" type="List"/>
         </out-parameters>
     </service>
+
+    <service verb="send" noun="SupplierOrder" type="script"
+             location="classpath://ro/colibri/legacy/service/ui/sendSupplierOrder.groovy">
+        <in-parameters>
+            <parameter name="channel" type="Map" required="true">
+                <parameter name="channelId"/>
+            </parameter>
+            <parameter name="requirements" type="List" required="true">
+                <parameter name="item" type="Map">
+                    <parameter name="barcode"/>
+                    <parameter name="name"/>
+                    <parameter name="uom"/>
+                    <parameter name="lastBuyingPriceNoTva" type="BigDecimal"/>
+                    <parameter name="pricePerUom" type="BigDecimal"/>
+                    <parameter name="quantityTotal" type="BigDecimal"/>
+                </parameter>
+            </parameter>
+            <parameter name="facilityId" required="true"/>
+            <parameter name="otherGestiuneId" type="Integer" required="true"/>
+            <parameter name="supplierId" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="transferId" type="Long"/>
+        </out-parameters>
+    </service>
 </services>

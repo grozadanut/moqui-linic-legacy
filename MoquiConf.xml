@@ -3,6 +3,8 @@
 <moqui-conf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/moqui-conf-3.xsd">
     <default-property name="ANAF_CONNECTOR_BASE_URL" value="https://localhost:8083"/>
     <default-property name="SCRAPE_URL" value="http://dunca-scraper:8080/scrape"/>
+    <default-property name="OP_INTERNA_ID" value="1170"/>
+    <default-property name="java.naming.provider.url" value="http-remoting://localhost:8080"/>
 
     <screen-facade>
         <screen location="component://webroot/screen/webroot/apps.xml">

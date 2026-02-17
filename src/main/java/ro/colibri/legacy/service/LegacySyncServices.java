@@ -7,20 +7,24 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.moqui.context.ExecutionContext;
 import org.moqui.entity.EntityValue;
 import org.moqui.service.ServiceException;
+import ro.colibri.beans.ManagerBean;
+import ro.colibri.beans.ManagerBeanRemote;
 import ro.colibri.beans.VanzariBean;
 import ro.colibri.beans.VanzariBeanRemote;
-import ro.colibri.entities.comercial.Operatiune;
-import ro.colibri.entities.comercial.Partner;
-import ro.colibri.entities.comercial.Product;
+import ro.colibri.entities.comercial.*;
+import ro.colibri.util.InvocationResult;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.Map;
 
+import static ro.colibri.util.ListUtils.toImmutableList;
 import static ro.colibri.util.StringUtils.isEmpty;
 
 public class LegacySyncServices {
@@ -273,5 +277,28 @@ public class LegacySyncServices {
     public static ImmutableList<Product> convertToProducts(final ImmutableList<Operatiune> ops) {
         final VanzariBeanRemote bean = ServiceLocator.getBusinessService(VanzariBean.class, VanzariBeanRemote.class);
         return bean.convertToProducts(ops);
+    }
+
+    public static InvocationResult addOperationToUnpersistedDoc(final Document.TipDoc tipDoc, final String doc, final String nrDoc, final LocalDate dataDoc, final String nrRec,
+                                                                final LocalDate dataRec, final Long partnerId, final boolean rpz, final Operatiune newOp, final Integer otherTransferGestId) {
+        final ManagerBeanRemote bean = ServiceLocator.getBusinessService(ManagerBean.class, ManagerBeanRemote.class);
+        return bean.addOperationToUnpersistedDoc(tipDoc, doc, nrDoc, dataDoc, nrRec, dataRec, partnerId, rpz, newOp, otherTransferGestId);
+    }
+
+    public static InvocationResult addOperationToDoc(final long docId, final Operatiune op, final Integer otherTransferGestId) {
+        final ManagerBeanRemote bean = ServiceLocator.getBusinessService(ManagerBean.class, ManagerBeanRemote.class);
+        return bean.addOperationToDoc(docId, op, otherTransferGestId);
+    }
+
+    public static ImmutableList<Gestiune> allGestiuni() {
+        final ManagerBeanRemote bean = ServiceLocator.getBusinessService(ManagerBean.class, ManagerBeanRemote.class);
+        return bean.allGestiuni().stream()
+                .sorted(Comparator.comparing(Gestiune::getImportName))
+                .collect(toImmutableList());
+    }
+
+    public static long autoNumber(final Document.TipDoc tipDoc, final String doc, final Integer gestiuneId) {
+        final ManagerBeanRemote bean = ServiceLocator.getBusinessService(ManagerBean.class, ManagerBeanRemote.class);
+        return bean.autoNumber(tipDoc, doc, gestiuneId);
     }
 }

@@ -34,7 +34,7 @@ public class ServiceLocator {
 
     public static final String INITIAL_CONTEXT_FACTORY_VALUE = "org.wildfly.naming.client.WildFlyInitialContextFactory";
     public static final String PROVIDER_URL_VALUE = System.getProperty(Context.PROVIDER_URL,
-            "http-remoting://192.168.0.60:8080");
+            "http-remoting://localhost:8080");
 
     static {
         SERVICES_CACHE = new HashMap<>();
