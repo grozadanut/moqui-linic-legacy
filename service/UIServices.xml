@@ -113,6 +113,7 @@ along with this software (see the LICENSE.md file). If not, see
         <in-parameters>
             <parameter name="channel" type="Map" required="true">
                 <parameter name="channelId"/>
+                <parameter name="chatId"/>
             </parameter>
             <parameter name="requirements" type="List" required="true">
                 <parameter name="item" type="Map">
@@ -125,11 +126,24 @@ along with this software (see the LICENSE.md file). If not, see
                 </parameter>
             </parameter>
             <parameter name="facilityId" required="true"/>
-            <parameter name="otherGestiuneId" type="Integer" required="true"/>
-            <parameter name="supplierId" required="true"/>
+            <parameter name="supplier" type="Map"/>
+            <parameter name="otherGestiuneId" type="Integer"/>
         </in-parameters>
         <out-parameters>
             <parameter name="transferId" type="Long"/>
+        </out-parameters>
+    </service>
+
+    <service verb="send" noun="WhatsappMessage" type="remote-rest"
+             method="POST" location="${System.getProperty('OWA_URL')}/sendText">
+        <in-parameters>
+            <parameter name="args" type="Map">
+                <parameter name="to"/>
+                <parameter name="content"/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="response" type="Map"/>
         </out-parameters>
     </service>
 </services>

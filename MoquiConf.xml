@@ -5,6 +5,7 @@
     <default-property name="SCRAPE_URL" value="http://dunca-scraper:8080/scrape"/>
     <default-property name="OP_INTERNA_ID" value="1170"/>
     <default-property name="java.naming.provider.url" value="http-remoting://localhost:8080"/>
+    <default-property name="OWA_URL" value="http://owa:8002"/>
 
     <screen-facade>
         <screen location="component://webroot/screen/webroot/apps.xml">
