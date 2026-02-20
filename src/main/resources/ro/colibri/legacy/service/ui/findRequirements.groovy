@@ -4,6 +4,7 @@ import org.moqui.context.ExecutionContext
 import org.moqui.entity.EntityCondition
 import org.moqui.entity.EntityDynamicView
 import org.moqui.entity.EntityFind
+import ro.colibri.util.PresentationUtils
 
 ExecutionContext ec = context.ec
 
@@ -40,9 +41,10 @@ resultList = efRequirement.list().groupBy { [productId:it.productId, quantityTot
         .collect { k, v ->
             [productId:k.productId,
              quantityTotal:k.quantityTotal,
-             supplierNames:v.sort { it.preferredOrderEnumId}
-                     .sort {it.price}
-                     .collect { it.supplierName+"("+it.price+")" }
+             supplierNames:v.sort { a, b ->
+                            b.preferredOrderEnumId <=> a.preferredOrderEnumId ?:   // DESC
+                            a.price <=> b.price}                                    // ASC
+                     .collect { it.supplierName+"("+PresentationUtils.displayBigDecimal( it.price)+")" }
                      .join(", "),
              description: v[0].description]
         }
