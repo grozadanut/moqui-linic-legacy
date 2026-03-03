@@ -301,4 +301,23 @@ public class LegacySyncServices {
         final ManagerBeanRemote bean = ServiceLocator.getBusinessService(ManagerBean.class, ManagerBeanRemote.class);
         return bean.autoNumber(tipDoc, doc, gestiuneId);
     }
+
+    public static ImmutableList<Document> filteredDocuments(final Integer gestiuneId,
+                                                            final Long partnerId, final Document.TipDoc tipDoc, final LocalDate from, final LocalDate to, final AccountingDocument.RPZLoad rpzLoad, final AccountingDocument.CasaLoad casaLoad,
+                                                            final AccountingDocument.BancaLoad bancaLoad, final Integer contBancarId, final AccountingDocument.DocumentTypesLoad documentTypes, final AccountingDocument.CoveredDocsLoad coveredLoad,
+                                                            final Boolean shouldTransport, final Integer userId, final AccountingDocument.ContaLoad contaLoad, final LocalDate transportFrom,
+                                                            final LocalDate transportTo)
+    {
+        final ManagerBeanRemote bean = ServiceLocator.getBusinessService(ManagerBean.class, ManagerBeanRemote.class);
+        final ImmutableList<Document> docs = bean.filteredDocuments(gestiuneId, partnerId, tipDoc, from, to, rpzLoad,
+                casaLoad, bancaLoad, contBancarId, documentTypes, coveredLoad, shouldTransport, userId, contaLoad,
+                transportFrom, transportTo);
+        return docs;
+    }
+
+    public static InvocationResult regBanca(final Integer gestiuneId, final Integer contBancarId, final LocalDate from, final LocalDate to)
+    {
+        final ManagerBeanRemote bean = ServiceLocator.getBusinessService(ManagerBean.class, ManagerBeanRemote.class);
+        return bean.regBanca(gestiuneId, contBancarId, from, to);
+    }
 }
