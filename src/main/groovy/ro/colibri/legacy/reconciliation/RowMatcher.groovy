@@ -22,7 +22,7 @@ class RowMatcher implements IdentityMatcher {
                         List.of(new MatchSignal("type", BigDecimal.ONE, "balance"))))
             // DEBIT/PLATA
             case "commissions":
-                return matchCommisions(left, right)
+                return matchCommissions(left, right)
             case "transfersToLinic":
                 return matchTransfers(left, right)
             case "otherOutgPayments":
@@ -38,6 +38,7 @@ class RowMatcher implements IdentityMatcher {
                 if (!left.isEmpty() && !right.isEmpty())
                     return Stream.of(new IdentityMatch(left, right, new BigDecimal("0.7"), IdentityStatus.CONFIRMED,
                             List.of(new MatchSignal("otherIncPayments", BigDecimal.ONE, "matched by TipDoc.INCASARE, partnerName, and total"))))
+                return Stream.of()
             // DEBIT OR CREDIT
             case "byTotals":
                 return Stream.of(new IdentityMatch(left, right, new BigDecimal("0.5"), IdentityStatus.PROBABLE,
@@ -46,7 +47,7 @@ class RowMatcher implements IdentityMatcher {
         return Stream.of()
     }
 
-    def Stream<IdentityMatch> matchCommisions(List<NormalizedRecord> left, List<NormalizedRecord> right) {
+    static Stream<IdentityMatch> matchCommissions(List<NormalizedRecord> left, List<NormalizedRecord> right) {
         // IF line starts with ignore case 'COMIS' THEN doc.gestiune=gestiuneId | Partner='RAIFF gestiune.name.upper' | TipDoc.PLATA | doc=CARD | docNr=NC | date=closingDate | doc.name=COM | doc.total=sum(lines) | banca=contBancarId
         List<NormalizedRecord> leftMatch = left.stream()
                 .filter { StringUtils.globalIsMatch(it.fields.getString("partnerName"), "RAIFF", StringUtils.TextFilterMethod.BEGINS_WITH)}
@@ -65,7 +66,7 @@ class RowMatcher implements IdentityMatcher {
         return Stream.of()
     }
 
-    def Stream<IdentityMatch> matchTransfers(List<NormalizedRecord> left, List<NormalizedRecord> right) {
+    static Stream<IdentityMatch> matchTransfers(List<NormalizedRecord> left, List<NormalizedRecord> right) {
         // ELSE IF line.partner = 'LINIC SRL' THEN doc.gestiune=L1 | Partner='RAIFF gestiune.name.upper' | TipDoc.PLATA | doc='ORDIN PLATA' | docNr=OP | date=line.date | doc.name=line.description | doc.total=line.total | banca=contBancarId
         List<NormalizedRecord> leftMatch = left.stream()
                 .filter { StringUtils.globalIsMatch(it.fields.getString("partnerName"), "RAIFF", StringUtils.TextFilterMethod.BEGINS_WITH)}
@@ -82,7 +83,7 @@ class RowMatcher implements IdentityMatcher {
         return Stream.of()
     }
 
-    def Stream<IdentityMatch> matchOutgPayments(List<NormalizedRecord> left, List<NormalizedRecord> right) {
+    static Stream<IdentityMatch> matchOutgPayments(List<NormalizedRecord> left, List<NormalizedRecord> right) {
         // ELSE Partner=line.partner | TipDoc.PLATA | doc='ORDIN PLATA' | date=line.date | doc.total=line.total | banca=contBancarId
         List<NormalizedRecord> leftMatch = left.stream()
                 .filter { StringUtils.globalIsMatch(it.fields.getString("doc"), "ORDIN PLATA", StringUtils.TextFilterMethod.EQUALS)}
@@ -97,7 +98,7 @@ class RowMatcher implements IdentityMatcher {
         return Stream.of()
     }
 
-    def Stream<IdentityMatch> matchDeposits(List<NormalizedRecord> left, List<NormalizedRecord> right) {
+    static Stream<IdentityMatch> matchDeposits(List<NormalizedRecord> left, List<NormalizedRecord> right) {
         // IF line contains 'Depunere numerar' THEN doc.gestiune=gestiuneId | Partner='RAIFF gestiune.name.upper' | TipDoc.INCASARE | doc='CHITANTA' | date=line.date | doc.name=INC | doc.total=line.total | banca=contBancarId
         List<NormalizedRecord> leftMatch = left.stream()
                 .filter { StringUtils.globalIsMatch(it.fields.getString("partnerName"), "RAIFF", StringUtils.TextFilterMethod.BEGINS_WITH)}
@@ -116,7 +117,7 @@ class RowMatcher implements IdentityMatcher {
         return Stream.of()
     }
 
-    def Stream<IdentityMatch> matchPosTotals(List<NormalizedRecord> left, List<NormalizedRecord> right) {
+    static Stream<IdentityMatch> matchPosTotals(List<NormalizedRecord> left, List<NormalizedRecord> right) {
         // ELSE IF line starts with 'AK' AND contains 'POS'
         //   THEN doc.gestiune=gestiuneId | Partner='CARD INCASARE' | TipDoc.INCASARE | doc='CARD' | docNr='NC' | date=line.date | doc.name='INC' | doc.total=line.total | banca=contBancarId
         //   OR doc.gestiune=gestiuneId | Partner not 'CARD INCASARE' or 'RAIFF...' | TipDoc.INCASARE | doc='CARD' | date=line.date |  doc.total=line.total | banca=contBancarId
@@ -144,7 +145,7 @@ class RowMatcher implements IdentityMatcher {
         return Stream.of()
     }
 
-    def Stream<IdentityMatch> matchPos(List<NormalizedRecord> left, List<NormalizedRecord> right) {
+    static Stream<IdentityMatch> matchPos(List<NormalizedRecord> left, List<NormalizedRecord> right) {
         // ELSE IF line starts with 'AK' AND contains 'POS'
         //   THEN doc.gestiune=gestiuneId | Partner='CARD INCASARE' | TipDoc.INCASARE | doc='CARD' | docNr='NC' | date=line.date | doc.name='INC' | doc.total=line.total | banca=contBancarId
         //   OR doc.gestiune=gestiuneId | Partner not 'CARD INCASARE' or 'RAIFF...' | TipDoc.INCASARE | doc='CARD' | date=line.date |  doc.total=line.total | banca=contBancarId
