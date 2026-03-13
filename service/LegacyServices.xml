@@ -35,7 +35,7 @@ along with this software (see the LICENSE.md file). If not, see
             Import product Pareto category for L2
         </description>
         <in-parameters>
-            <parameter name="uploadedFile" type="org.apache.commons.fileupload.disk.DiskFileItem" required="true"/>
+            <parameter name="uploadedFile" type="org.apache.commons.fileupload2.core.DiskFileItem" required="true"/>
         </in-parameters>
     </service>
 
@@ -45,7 +45,7 @@ along with this software (see the LICENSE.md file). If not, see
             Import main supplier for products for L2
         </description>
         <in-parameters>
-            <parameter name="uploadedFile" type="org.apache.commons.fileupload.disk.DiskFileItem" required="true"/>
+            <parameter name="uploadedFile" type="org.apache.commons.fileupload2.core.DiskFileItem" required="true"/>
         </in-parameters>
     </service>
 

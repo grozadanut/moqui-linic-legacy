@@ -3,7 +3,7 @@ package ro.colibri.legacy.service;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.moqui.context.ExecutionContext;
 import org.moqui.entity.EntityValue;
 import org.moqui.service.ServiceException;
@@ -185,7 +185,11 @@ public class LegacySyncServices {
             throw new ServiceException("Error at importProductStatistics", e);
         }
 
-        fileBytes.delete();
+        try {
+            fileBytes.delete();
+        } catch (IOException e) {
+            ec.getLogger().error(e.getMessage(), e);
+        }
         return Map.of();
     }
 
@@ -265,7 +269,11 @@ public class LegacySyncServices {
             throw new ServiceException("Error at importProductSupplier", e);
         }
 
-        fileBytes.delete();
+        try {
+            fileBytes.delete();
+        } catch (IOException e) {
+            ec.getLogger().error(e.getMessage(), e);
+        }
         return Map.of();
     }
 
