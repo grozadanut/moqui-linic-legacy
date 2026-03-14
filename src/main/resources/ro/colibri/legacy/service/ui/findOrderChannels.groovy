@@ -6,7 +6,7 @@ import org.moqui.entity.EntityFind
 ExecutionContext ec = context.ec
 
 EntityFind ef = ec.entity.find("mantle.party.contact.PartyContactMechTelecomNumber").distinct(true)
-ef.selectFields(["contactNumber"])
+ef.selectFields(["contactNumber", "askForName"])
 ef.conditionDate("fromDate", "thruDate", ec.user.nowTimestamp)
 ef.condition("partyId", supplierId)
 ef.condition("contactMechPurposeId", "PhoneShippingOrigin")
@@ -14,7 +14,8 @@ ef.condition("contactMechPurposeId", "PhoneShippingOrigin")
 resultList = []
 resultList.add([channelId: "print", channelName: "Printeaza"])
 for (tel in ef.list()) {
-    resultList.add([channelId: "whatsapp", channelName: "WhatsApp", chatId: tel.contactNumber+"@lid"])
+    resultList.add([channelId: "whatsapp", channelName: "WhatsApp ${tel.askForName ?: ''}",
+                    chatId: tel.contactNumber+"@lid"])
 }
 
 if (ec.entity.find("mantle.party.PartyRole")
