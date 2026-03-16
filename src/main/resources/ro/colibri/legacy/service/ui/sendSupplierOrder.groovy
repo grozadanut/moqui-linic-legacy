@@ -70,15 +70,14 @@ if (channel.channelId.equalsIgnoreCase("transfer")) {
         }
     }
 } else if (channel.channelId.equalsIgnoreCase("whatsapp")) {
-    var args = [to: channel.chatId, content:
-            requirements.stream()
-            .map {MessageFormat.format("{0} \t {1} {2}", it.name, it.quantityTotal, it.uom)}
+    var msgContent = requirements.stream()
+            .map { MessageFormat.format("{0} \t {1} {2}", it.name, it.quantityTotal, it.uom)}
             .toList()
-            .join(System.lineSeparator())]
+            .join(System.lineSeparator())
     var whatsappResult = ec.service.sync().name("UIServices.send#WhatsappMessage")
-            .parameters([args: args])
+            .parameters([args: [to: channel.chatId, content: msgContent]])
             .call()
-    if (whatsappResult.get("success"))
+    if (whatsappResult.get("success")) {
         requirements.forEach {req ->
             ec.service.sync().name("UIServices.statusTo#Requirement")
                     .parameters([facilityId: facilityId])
@@ -88,6 +87,15 @@ if (channel.channelId.equalsIgnoreCase("transfer")) {
                     .parameters([statusId: "RqmtStOrdered"])
                     .call()
         }
-    else
+
+        def auditChannel = ec.service.sync().name("mantle.party.PartyServices.get#PartySettingValue")
+                .parameters([partySettingTypeId: "SupplierOrderWhatsappAuditChannel", partyId: facilityId])
+                .call()?.settingValue
+        if (auditChannel)
+            ec.service.async().name("UIServices.send#WhatsappMessage")
+                    .parameters([args: [to: auditChannel, content:
+                            "Catre ${supplier.organizationName} ${channel.channelName}:\n\r${msgContent}"]])
+                    .call()
+    } else
         ec.message.addError("Eroare la trimiterea mesajului pe WhatsApp: "+whatsappResult.get("response"))
 }

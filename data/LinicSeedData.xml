@@ -61,4 +61,7 @@
                                              description="Invoice received through a message from ANAF eFactura"/>
     <moqui.service.message.SystemMessageType systemMessageTypeId="ANAFReceivedInvoiceLine"
                                              description="Invoice line split from an ANAF eInvoice"/>
+
+    <mantle.party.PartySettingType description="Sends all supplier whatsapp orders to this channel. Useful for auditing."
+                                   partySettingTypeId="SupplierOrderWhatsappAuditChannel"/>
 </entity-facade-xml>
