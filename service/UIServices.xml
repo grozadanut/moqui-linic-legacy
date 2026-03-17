@@ -180,7 +180,7 @@ along with this software (see the LICENSE.md file). If not, see
                 return ec.makeNotificationMessage().type(type?:"info")
                         .topic(topic).subTopic(subTopic).title(title)
                         .showAlert(showAlert?:false)
-                        .message(message)
+                        .message((String)message)
                         .userIds(new HashSet<>(userIds)).userGroupId(userGroupId)
                         .send(persist?:false)
             ]]></script>
