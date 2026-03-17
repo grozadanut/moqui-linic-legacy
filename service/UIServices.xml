@@ -159,4 +159,31 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="resultList" type="List"/>
         </out-parameters>
     </service>
+
+    <service verb="send" noun="NotificationMessage">
+        <in-parameters>
+            <parameter name="type" type="org.moqui.context.NotificationMessage.NotificationType"/>
+            <parameter name="topic"/>
+            <parameter name="subTopic"/>
+            <parameter name="title"/>
+            <parameter name="showAlert" type="Boolean"/>
+            <parameter name="message"/>
+            <parameter name="userIds" type="Set"/>
+            <parameter name="userGroupId"/>
+            <parameter name="persist" type="Boolean"/>
+        </in-parameters>
+        <out-parameters>
+            <auto-parameters/>
+        </out-parameters>
+        <actions>
+            <script><![CDATA[
+                return ec.makeNotificationMessage().type(type?:"info")
+                        .topic(topic).subTopic(subTopic).title(title)
+                        .showAlert(showAlert?:false)
+                        .message(message)
+                        .userIds(new HashSet<>(userIds)).userGroupId(userGroupId)
+                        .send(persist?:false)
+            ]]></script>
+        </actions>
+    </service>
 </services>

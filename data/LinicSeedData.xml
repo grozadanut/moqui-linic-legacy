@@ -64,4 +64,5 @@
 
     <mantle.party.PartySettingType description="Sends all supplier whatsapp orders to this channel. Useful for auditing."
                                    partySettingTypeId="SupplierOrderWhatsappAuditChannel"/>
+    <moqui.security.user.NotificationTopic topic="LegacyGeneral" description="Notifications from the legacy system"/>
 </entity-facade-xml>
