@@ -15,8 +15,10 @@
 apply plugin: 'java'
 apply plugin: 'groovy'
 
-// sourceCompatibility = '1.8'
-// targetCompatibility = '1.8'
+java {
+    sourceCompatibility = 21
+    targetCompatibility = 21
+}
 
 def componentNode = parseComponent(project)
 version = componentNode.'@version'
