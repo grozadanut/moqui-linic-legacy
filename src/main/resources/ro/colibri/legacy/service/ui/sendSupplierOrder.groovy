@@ -92,9 +92,8 @@ if (channel.channelId.equalsIgnoreCase("transfer")) {
                 .parameters([partySettingTypeId: "SupplierOrderWhatsappAuditChannel", partyId: facilityId])
                 .call()?.settingValue
         if (auditChannel)
-            ec.service.async().name("UIServices.send#WhatsappMessage")
-                    .parameters([authUserAccount: ec.user.userAccount,
-                            args: [to: auditChannel, content:
+            ec.service.sync().name("UIServices.send#WhatsappMessage")
+                    .parameters([args: [to: auditChannel, content:
                             "Catre ${supplier.organizationName} ${channel.channelName}:\n\r${msgContent}"]])
                     .call()
     } else
