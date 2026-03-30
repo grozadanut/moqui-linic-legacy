@@ -69,4 +69,7 @@ along with this software (see the LICENSE.md file). If not, see
     <resource name="notification">
         <method type="post"><service name="UIServices.send#NotificationMessage"/></method>
     </resource>
+    <resource name="sms">
+        <method type="post"><service name="UIServices.send#ColibriSms"/></method>
+    </resource>
 </resource>

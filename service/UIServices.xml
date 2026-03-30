@@ -135,19 +135,6 @@ along with this software (see the LICENSE.md file). If not, see
         </out-parameters>
     </service>
 
-    <service verb="send" noun="WhatsappMessage" type="remote-rest"
-             method="POST" location="${System.getProperty('OWA_URL')}/sendText">
-        <in-parameters>
-            <parameter name="args" type="Map">
-                <parameter name="to"/>
-                <parameter name="content"/>
-            </parameter>
-        </in-parameters>
-        <out-parameters>
-            <parameter name="response" type="Map"/>
-        </out-parameters>
-    </service>
-
     <service verb="reconcile" noun="BankStatement" type="java"
              location="ro.colibri.legacy.service.ui.Reconciler" method="reconcile">
         <in-parameters>
@@ -184,6 +171,56 @@ along with this software (see the LICENSE.md file). If not, see
                         .userIds(new HashSet<>(userIds)).userGroupId(userGroupId)
                         .send(persist?:false)
             ]]></script>
+        </actions>
+    </service>
+
+    <service verb="send" noun="WhatsappMessage" type="remote-rest"
+             method="POST" location="${System.getProperty('OWA_URL')}/sendText">
+        <in-parameters>
+            <parameter name="args" type="Map">
+                <parameter name="to"/>
+                <parameter name="content"/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="response" type="Map"/>
+        </out-parameters>
+    </service>
+
+    <service verb="send" noun="Sms" type="remote-rest"
+             method="POST" location="${System.getProperty('SMSGATE_URL')}/api/3rdparty/v1/messages">
+        <in-parameters>
+            <parameter name="basicUser"/>
+            <parameter name="basicPassword"/>
+            <parameter name="textMessage" type="Map">
+                <parameter name="text"/>
+            </parameter>
+            <parameter name="deviceId"/>
+            <parameter name="phoneNumbers" type="List"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="response" type="Map"/>
+        </out-parameters>
+    </service>
+
+    <service verb="send" noun="ColibriSms">
+        <in-parameters>
+            <parameter name="textMessage" type="Map">
+                <parameter name="text"/>
+            </parameter>
+            <parameter name="phoneNumbers" type="List"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="response" type="Map"/>
+        </out-parameters>
+        <actions>
+            <service-call name="UIServices.send#Sms" in-map="[
+                deviceId: ${System.getProperty('SMSGATE_DEVICE_ID')},
+                basicUser: ${System.getProperty('SMSGATE_USER')},
+                basicPassword: ${System.getProperty('SMSGATE_PASSWORD')},
+                textMessage: textMessage,
+                phoneNumbers: phoneNumbers
+            ]" out-map="response"/>
         </actions>
     </service>
 </services>
