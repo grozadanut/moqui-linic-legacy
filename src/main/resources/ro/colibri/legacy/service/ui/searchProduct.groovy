@@ -45,12 +45,9 @@ for (var entity in ec.entity.find("mantle.product.ProductFindView")
         var supplierName = supplierPrice ? ec.entity.find("mantle.party.Organization")
                 .condition("partyId", supplierPrice.vendorPartyId)
                 .one() : null
-
-        if (supplierName?.organizationName?.equals("DUNCA CONSTRUCT SRL"))
-            tileName = ro.colibri.util.Utils.extractTileName(p.productName)
     }
 
     productList.add(p)
 }
 
-return [productList: productList, tileName: tileName]
+return [productList: productList]
