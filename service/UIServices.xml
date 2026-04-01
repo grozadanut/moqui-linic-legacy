@@ -190,13 +190,13 @@ along with this software (see the LICENSE.md file). If not, see
     <service verb="send" noun="Sms" type="remote-rest"
              method="POST" location="${System.getProperty('SMSGATE_URL')}/api/3rdparty/v1/messages">
         <in-parameters>
-            <parameter name="basicUser"/>
-            <parameter name="basicPassword"/>
+            <parameter name="basicUser" required="true"/>
+            <parameter name="basicPassword" required="true"/>
             <parameter name="textMessage" type="Map">
                 <parameter name="text"/>
             </parameter>
             <parameter name="deviceId"/>
-            <parameter name="phoneNumbers" type="List"/>
+            <parameter name="phoneNumbers" type="List" required="true"/>
         </in-parameters>
         <out-parameters>
             <parameter name="response" type="Map"/>
@@ -205,20 +205,18 @@ along with this software (see the LICENSE.md file). If not, see
 
     <service verb="send" noun="ColibriSms">
         <in-parameters>
-            <parameter name="textMessage" type="Map">
-                <parameter name="text"/>
-            </parameter>
-            <parameter name="phoneNumbers" type="List"/>
+            <parameter name="text" required="true"/>
+            <parameter name="phoneNumbers" type="List" required="true"/>
         </in-parameters>
         <out-parameters>
             <parameter name="response" type="Map"/>
         </out-parameters>
         <actions>
             <service-call name="UIServices.send#Sms" in-map="[
-                deviceId: ${System.getProperty('SMSGATE_DEVICE_ID')},
-                basicUser: ${System.getProperty('SMSGATE_USER')},
-                basicPassword: ${System.getProperty('SMSGATE_PASSWORD')},
-                textMessage: textMessage,
+                deviceId: System.getProperty('SMSGATE_DEVICE_ID'),
+                basicUser: System.getProperty('SMSGATE_USER'),
+                basicPassword: System.getProperty('SMSGATE_PASSWORD'),
+                textMessage: [text: text],
                 phoneNumbers: phoneNumbers
             ]" out-map="response"/>
         </actions>
