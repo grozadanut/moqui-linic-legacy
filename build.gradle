@@ -56,7 +56,7 @@ dependencies {
 
     // Add moqui-linic-legacy dependencies here
     implementation fileTree('librepo')
-    implementation("ro.flexbiz.util:commons:1.j11.0")
+    implementation("ro.flexbiz.util:commons:1.0.2")
     implementation("org.apache.commons:commons-csv:1.12.0")
     // Source: https://mvnrepository.com/artifact/com.prowidesoftware/pw-swift-core
     implementation("com.prowidesoftware:pw-swift-core:SRU2025-10.3.8")

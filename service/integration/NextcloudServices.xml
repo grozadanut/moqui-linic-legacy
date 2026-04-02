@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-3.xsd">
+    <service verb="sync" noun="CustomersToNextcloud">
+        <in-parameters>
+            <parameter name="nextcloudUrl" default-value="${System.getProperty('NEXTCLOUD_URL')}"/>
+            <parameter name="username" default-value="${System.getProperty('NEXTCLOUD_USERNAME')}"/>
+            <parameter name="password" default-value="${System.getProperty('NEXTCLOUD_PASSWORD')}"/>
+            <parameter name="addressbookName" default-value="clienti"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="response"/>
+        </out-parameters>
+        <actions>
+            <if condition="!nextcloudUrl || !username || !password">
+                <return error="true" message="Nextcloud credentials/URL not configured"/>
+            </if>
+            
+            <script><![CDATA[
+                import org.moqui.util.RestClient
+
+                int count = 0
+                List<String> errors = []
+                
+                // Get all customers. We query by PartyRole to get unique partyIds safely.
+                def customerRoles = ec.entity.find("mantle.party.PartyRole")
+                    .condition("roleTypeId", "Customer")
+                    .list()
+
+                for (def customerRole in customerRoles) {
+                    String partyId = customerRole.partyId
+                    
+                    // Fetch name using the built-in PartyDetail view
+                    def partyDetail = ec.entity.find("mantle.party.PartyDetail")
+                        .condition("partyId", partyId)
+                        .one()
+                    
+                    String name = partyDetail?.organizationName ?: "${partyDetail?.firstName ?: ''} ${partyDetail?.lastName ?: ''}".trim()
+                    if (!name) name = "Customer ${partyId}"
+
+                    // Fetch phone number using the built-in PartyContactMechTelecomNumber view
+                    def telecomList = ec.entity.find("mantle.party.contact.PartyContactMechTelecomNumber")
+                        .condition("partyId", partyId)
+                        .orderBy("-fromDate")
+                        .list()
+                        
+                    def telecom = telecomList ? telecomList.first() : null
+                    
+                    String phone = ""
+                    if (telecom) {
+                        phone = (telecom.countryCode ? '+' + telecom.countryCode + ' ' : '') +
+                                (telecom.areaCode ? telecom.areaCode + ' ' : '') +
+                                telecom.contactNumber
+                        phone = ro.flexbiz.util.commons.StringUtils.sanitizePhoneNumber(phone)
+                    }
+
+                    // Build vCard 3.0 format simple string
+                    StringBuilder vcf = new StringBuilder()
+                    vcf.append("BEGIN:VCARD\nVERSION:3.0\n")
+                    vcf.append("FN:").append(name).append("\n")
+                    if (phone) {
+                        vcf.append("TEL;TYPE=CELL,VOICE:").append(phone).append("\n")
+                    }
+                    vcf.append("CATEGORIES:Clienti\n")
+                    vcf.append("UID:moqui_party_").append(partyId).append("\n")
+                    vcf.append("END:VCARD\n")
+
+                    // Assuming Nextcloud CardDAV URL path structure: /remote.php/dav/addressbooks/users/{username}/{addressbook}/
+                    String urlStr = "${nextcloudUrl}/remote.php/dav/addressbooks/users/${username}/${addressbookName}/moqui_party_${partyId}.vcf"
+
+                    RestClient restClient = ec.service.rest().method("PUT").uri(urlStr)
+                        .basicAuth(username, password)
+                        .text(vcf.toString())
+                    
+                    try {
+                        RestClient.RestResponse restResponse = restClient.call()
+                        if (restResponse.statusCode < 200 || restResponse.statusCode >= 300) {
+                            String errMsg = "Failed to sync party ${partyId} to Nextcloud: HTTP ${restResponse.statusCode} - ${restResponse.text()}"
+                            ec.logger.warn(errMsg)
+                            errors.add(errMsg)
+                        } else {
+                            count++
+                        }
+                    } catch (Exception e) {
+                        String errMsg = "Error syncing party ${partyId} to Nextcloud: ${e.message}"
+                        ec.logger.error(errMsg, e)
+                        errors.add(errMsg)
+                    }
+                }
+                
+                String msg = "Successfully synced ${count} customers to Nextcloud address book '${addressbookName}'. ${errors.size()} errors."
+                ec.logger.info(msg)
+                
+                response = [successCount: count, errorCount: errors.size(), message: msg, errors: errors]
+            ]]></script>
+        </actions>
+    </service>
+    <service verb="sync" noun="SuppliersToNextcloud">
+        <in-parameters>
+            <parameter name="nextcloudUrl" default-value="${System.getProperty('NEXTCLOUD_URL')}"/>
+            <parameter name="username" default-value="${System.getProperty('NEXTCLOUD_USERNAME')}"/>
+            <parameter name="password" default-value="${System.getProperty('NEXTCLOUD_PASSWORD')}"/>
+            <parameter name="addressbookName" default-value="furnizori"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="response"/>
+        </out-parameters>
+        <actions>
+            <if condition="!nextcloudUrl || !username || !password">
+                <return error="true" message="Nextcloud credentials/URL not configured"/>
+            </if>
+            
+            <script><![CDATA[
+                import org.moqui.util.RestClient
+
+                int count = 0
+                List<String> errors = []
+                
+                // Get all suppliers. We query by PartyRole to get unique partyIds safely.
+                def supplierRoles = ec.entity.find("mantle.party.PartyRole")
+                    .condition("roleTypeId", "Supplier")
+                    .list()
+
+                for (def supplierRole in supplierRoles) {
+                    String partyId = supplierRole.partyId
+                    
+                    // Fetch name using the built-in PartyDetail view
+                    def partyDetail = ec.entity.find("mantle.party.PartyDetail")
+                        .condition("partyId", partyId)
+                        .one()
+                    
+                    String name = partyDetail?.organizationName ?: "${partyDetail?.firstName ?: ''} ${partyDetail?.lastName ?: ''}".trim()
+                    if (!name) name = "Supplier ${partyId}"
+
+                    // Fetch phone number using the built-in PartyContactMechTelecomNumber view
+                    def telecomList = ec.entity.find("mantle.party.contact.PartyContactMechTelecomNumber")
+                        .condition("partyId", partyId)
+                        .orderBy("-fromDate")
+                        .list()
+                        
+                    def telecom = telecomList ? telecomList.first() : null
+                    
+                    String phone = ""
+                    if (telecom) {
+                        phone = (telecom.countryCode ? '+' + telecom.countryCode + ' ' : '') +
+                                (telecom.areaCode ? telecom.areaCode + ' ' : '') +
+                                telecom.contactNumber
+                        phone = ro.flexbiz.util.commons.StringUtils.sanitizePhoneNumber(phone)
+                    }
+
+                    // Build vCard 3.0 format simple string
+                    StringBuilder vcf = new StringBuilder()
+                    vcf.append("BEGIN:VCARD\nVERSION:3.0\n")
+                    vcf.append("FN:").append(name).append("\n")
+                    if (phone) {
+                        vcf.append("TEL;TYPE=CELL,VOICE:").append(phone).append("\n")
+                    }
+                    vcf.append("CATEGORIES:Furnizori\n")
+                    vcf.append("UID:moqui_party_").append(partyId).append("\n")
+                    vcf.append("END:VCARD\n")
+
+                    // Assuming Nextcloud CardDAV URL path structure: /remote.php/dav/addressbooks/users/{username}/{addressbook}/
+                    String urlStr = "${nextcloudUrl}/remote.php/dav/addressbooks/users/${username}/${addressbookName}/moqui_party_${partyId}.vcf"
+
+                    RestClient restClient = ec.service.rest().method("PUT").uri(urlStr)
+                        .basicAuth(username, password)
+                        .text(vcf.toString())
+                    
+                    try {
+                        RestClient.RestResponse restResponse = restClient.call()
+                        if (restResponse.statusCode < 200 || restResponse.statusCode >= 300) {
+                            String errMsg = "Failed to sync party ${partyId} to Nextcloud: HTTP ${restResponse.statusCode} - ${restResponse.text()}"
+                            ec.logger.warn(errMsg)
+                            errors.add(errMsg)
+                        } else {
+                            count++
+                        }
+                    } catch (Exception e) {
+                        String errMsg = "Error syncing party ${partyId} to Nextcloud: ${e.message}"
+                        ec.logger.error(errMsg, e)
+                        errors.add(errMsg)
+                    }
+                }
+                
+                String msg = "Successfully synced ${count} suppliers to Nextcloud address book '${addressbookName}'. ${errors.size()} errors."
+                ec.logger.info(msg)
+                
+                response = [successCount: count, errorCount: errors.size(), message: msg, errors: errors]
+            ]]></script>
+        </actions>
+    </service>
+</services>
