@@ -99,6 +99,10 @@ test {
     systemProperty 'moqui.conf', 'conf/MoquiDevConf.xml'
     systemProperty 'moqui.init.static', 'true'
 
+    if (project.hasProperty('profileTests')) {
+        jvmArgs '-XX:StartFlightRecording=duration=3600s,filename=moqui-linic-legacy.jfr,settings=profile'
+    }
+
     classpath += files(sourceSets.main.output.classesDirs)
     // filter out classpath entries that don't exist (gradle adds a bunch of these), or ElasticSearch JarHell will blow up
     classpath = classpath.filter { it.exists() }
