@@ -39,9 +39,10 @@
 
                     // Fetch phone number using the built-in PartyContactMechTelecomNumber view
                     def telecomList = ec.entity.find("mantle.party.contact.PartyContactMechTelecomNumber")
-                        .condition("partyId", partyId)
-                        .orderBy("-fromDate")
-                        .list()
+                            .condition("partyId", partyId)
+                            .condition("contactMechPurposeId", "PhonePrimary")
+                            .orderBy("-fromDate")
+                            .list()
                         
                     def telecom = telecomList ? telecomList.first() : null
                     
@@ -133,9 +134,10 @@
 
                     // Fetch phone number using the built-in PartyContactMechTelecomNumber view
                     def telecomList = ec.entity.find("mantle.party.contact.PartyContactMechTelecomNumber")
-                        .condition("partyId", partyId)
-                        .orderBy("-fromDate")
-                        .list()
+                            .condition("partyId", partyId)
+                            .condition("contactMechPurposeId", "PhonePrimary")
+                            .orderBy("-fromDate")
+                            .list()
                         
                     def telecom = telecomList ? telecomList.first() : null
                     

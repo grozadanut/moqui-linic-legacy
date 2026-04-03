@@ -176,23 +176,26 @@ public class LegacySyncServices {
 
             // Phone
             if (!isEmpty(legacyP.getPhone())) {
-                String contactMechId = legacyId + "_PHONE";
-                EntityValue contactMech = ec.getEntity().makeValue("mantle.party.contact.ContactMech");
-                contactMech.set("contactMechId", contactMechId);
-                contactMech.set("contactMechTypeEnumId", "CmtTelecomNumber");
-                contactMech.createOrUpdate();
+                String phoneStr = legacyP.getPhone().split("[,;]")[0].trim();
+                if (!isEmpty(phoneStr)) {
+                    String contactMechId = legacyId + "_PHONE";
+                    EntityValue contactMech = ec.getEntity().makeValue("mantle.party.contact.ContactMech");
+                    contactMech.set("contactMechId", contactMechId);
+                    contactMech.set("contactMechTypeEnumId", "CmtTelecomNumber");
+                    contactMech.createOrUpdate();
 
-                EntityValue telecomNumber = ec.getEntity().makeValue("mantle.party.contact.TelecomNumber");
-                telecomNumber.set("contactMechId", contactMechId);
-                telecomNumber.set("contactNumber", legacyP.getPhone());
-                telecomNumber.createOrUpdate();
+                    EntityValue telecomNumber = ec.getEntity().makeValue("mantle.party.contact.TelecomNumber");
+                    telecomNumber.set("contactMechId", contactMechId);
+                    telecomNumber.set("contactNumber", phoneStr);
+                    telecomNumber.createOrUpdate();
 
-                EntityValue partyContactMech = ec.getEntity().makeValue("mantle.party.contact.PartyContactMech");
-                partyContactMech.set("partyId", legacyId);
-                partyContactMech.set("contactMechId", contactMechId);
-                partyContactMech.set("contactMechPurposeId", "PhonePrimary");
-                partyContactMech.set("fromDate", Timestamp.valueOf(LocalDateTime.of(2000, 1, 1, 0, 0)));
-                partyContactMech.createOrUpdate();
+                    EntityValue partyContactMech = ec.getEntity().makeValue("mantle.party.contact.PartyContactMech");
+                    partyContactMech.set("partyId", legacyId);
+                    partyContactMech.set("contactMechId", contactMechId);
+                    partyContactMech.set("contactMechPurposeId", "PhonePrimary");
+                    partyContactMech.set("fromDate", Timestamp.valueOf(LocalDateTime.of(2000, 1, 1, 0, 0)));
+                    partyContactMech.createOrUpdate();
+                }
             }
 
             // Email
@@ -310,7 +313,7 @@ public class LegacySyncServices {
         if (isEmpty(judet))
             return null;
         if (judet.trim().length() == 2)
-            return "RO-"+judet.trim();
+            return "RO-" + judet.trim();
         switch (judet.toUpperCase()) {
             case "BIHOR":
                 return "RO-BH";
