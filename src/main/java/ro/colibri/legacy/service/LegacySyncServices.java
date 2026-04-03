@@ -128,15 +128,18 @@ public class LegacySyncServices {
             final String legacyId = legacyP.getId() + "";
             party.set("partyId", legacyId);
             party.set("partyTypeEnumId", isPerson ? "PtyPerson" : "PtyOrganization");
+            party.set("disabled", legacyP.isActiv() ? "N" : "Y");
             party.createOrUpdate();
 
             if (isPerson) {
-                String[] nameTokens = legacyP.getName().split(" ");
+                String[] nameTokens = legacyP.getName().replaceFirst("^A - ", "")
+                        .split(" ");
                 String lastName = nameTokens.length > 0 ? nameTokens[0] : ""; // nume de familie
                 String firstName = ""; // prenume
                 for (int i = 1; i < nameTokens.length; i++) {
                     firstName += nameTokens[i] + " ";
                 }
+                firstName = firstName.trim();
 
                 final EntityValue pg = ec.getEntity().makeValue("Person");
                 pg.set("partyId", legacyId);
@@ -149,6 +152,125 @@ public class LegacySyncServices {
                 pg.set("partyId", legacyId);
                 pg.set("organizationName", legacyP.getName());
                 pg.createOrUpdate();
+            }
+
+            // Cod Fiscal
+            if (!isEmpty(legacyP.getCodFiscal())) {
+                EntityValue partyIdentification = ec.getEntity().makeValue("mantle.party.PartyIdentification");
+                partyIdentification.set("partyId", legacyId);
+                partyIdentification.set("partyIdTypeEnumId", "PtidTaxId");
+                partyIdentification.set("idValue", legacyP.getCodFiscal());
+                partyIdentification.createOrUpdate();
+            }
+
+            // Reg Com
+            if (!isEmpty(legacyP.getRegCom())) {
+                EntityValue partyIdentification = ec.getEntity().makeValue("mantle.party.PartyIdentification");
+                partyIdentification.set("partyId", legacyId);
+                partyIdentification.set("partyIdTypeEnumId", "PtidTradeReg");
+                partyIdentification.set("idValue", legacyP.getRegCom());
+                partyIdentification.createOrUpdate();
+            }
+
+            // Phone
+            if (!isEmpty(legacyP.getPhone())) {
+                String contactMechId = legacyId + "_PHONE";
+                EntityValue contactMech = ec.getEntity().makeValue("mantle.party.contact.ContactMech");
+                contactMech.set("contactMechId", contactMechId);
+                contactMech.set("contactMechTypeEnumId", "CmtTelecomNumber");
+                contactMech.createOrUpdate();
+                
+                EntityValue telecomNumber = ec.getEntity().makeValue("mantle.party.contact.TelecomNumber");
+                telecomNumber.set("contactMechId", contactMechId);
+                telecomNumber.set("contactNumber", legacyP.getPhone());
+                telecomNumber.createOrUpdate();
+                
+                EntityValue partyContactMech = ec.getEntity().makeValue("mantle.party.contact.PartyContactMech");
+                partyContactMech.set("partyId", legacyId);
+                partyContactMech.set("contactMechId", contactMechId);
+                partyContactMech.set("contactMechPurposeId", "PhonePrimary");
+                partyContactMech.set("fromDate", Timestamp.valueOf(LocalDateTime.of(2000, 1, 1, 0, 0)));
+                partyContactMech.createOrUpdate();
+            }
+
+            // Email
+            if (!isEmpty(legacyP.getEmail())) {
+                String contactMechId = legacyId + "_EMAIL";
+                EntityValue contactMech = ec.getEntity().makeValue("mantle.party.contact.ContactMech");
+                contactMech.set("contactMechId", contactMechId);
+                contactMech.set("contactMechTypeEnumId", "CmtEmailAddress");
+                contactMech.set("infoString", legacyP.getEmail());
+                contactMech.createOrUpdate();
+                
+                EntityValue partyContactMech = ec.getEntity().makeValue("mantle.party.contact.PartyContactMech");
+                partyContactMech.set("partyId", legacyId);
+                partyContactMech.set("contactMechId", contactMechId);
+                partyContactMech.set("contactMechPurposeId", "EmailPrimary");
+                partyContactMech.set("fromDate", Timestamp.valueOf(LocalDateTime.of(2000, 1, 1, 0, 0)));
+                partyContactMech.createOrUpdate();
+            }
+
+            // Bank Account
+            if (!isEmpty(legacyP.getIban())) {
+                String pmtMethodId = legacyId + "_BANK";
+                EntityValue paymentMethod = ec.getEntity().makeValue("mantle.account.method.PaymentMethod");
+                paymentMethod.set("paymentMethodId", pmtMethodId);
+                paymentMethod.set("paymentMethodTypeEnumId", "PmtBankAccount");
+                paymentMethod.set("ownerPartyId", legacyId);
+                paymentMethod.createOrUpdate();
+
+                EntityValue bankAccount = ec.getEntity().makeValue("mantle.account.method.BankAccount");
+                bankAccount.set("paymentMethodId", pmtMethodId);
+                bankAccount.set("bankName", legacyP.getBanca());
+                bankAccount.set("accountNumber", legacyP.getIban());
+                bankAccount.createOrUpdate();
+            }
+
+            // Address (ro.colibri.embeddable.Address)
+            ro.colibri.embeddable.Address legacyAddr = legacyP.getAddress();
+            if (legacyAddr != null) {
+                String contactMechId = legacyId + "_ADDR";
+                EntityValue contactMech = ec.getEntity().makeValue("mantle.party.contact.ContactMech");
+                contactMech.set("contactMechId", contactMechId);
+                contactMech.set("contactMechTypeEnumId", "CmtPostalAddress");
+                contactMech.createOrUpdate();
+
+                EntityValue postalAddress = ec.getEntity().makeValue("mantle.party.contact.PostalAddress");
+                postalAddress.set("contactMechId", contactMechId);
+                postalAddress.set("countryGeoId", legacyAddr.getCountry());
+                postalAddress.set("countyGeoId", legacyAddr.getJudet());
+                postalAddress.set("city", legacyAddr.getOras());
+                postalAddress.set("address1", legacyAddr.getStrada());
+                postalAddress.set("postalCode", legacyAddr.getNr());
+                postalAddress.createOrUpdate();
+
+                EntityValue partyContactMech = ec.getEntity().makeValue("mantle.party.contact.PartyContactMech");
+                partyContactMech.set("partyId", legacyId);
+                partyContactMech.set("contactMechId", contactMechId);
+                partyContactMech.set("contactMechPurposeId", "PostalPrimary");
+                partyContactMech.set("fromDate", Timestamp.valueOf(LocalDateTime.of(2000, 1, 1, 0, 0)));
+                partyContactMech.createOrUpdate();
+            }
+
+            // Delivery Address (String)
+            if (!isEmpty(legacyP.getDeliveryAddress())) {
+                String contactMechId = legacyId + "_DELIV_ADDR";
+                EntityValue contactMech = ec.getEntity().makeValue("mantle.party.contact.ContactMech");
+                contactMech.set("contactMechId", contactMechId);
+                contactMech.set("contactMechTypeEnumId", "CmtPostalAddress");
+                contactMech.createOrUpdate();
+
+                EntityValue postalAddress = ec.getEntity().makeValue("mantle.party.contact.PostalAddress");
+                postalAddress.set("contactMechId", contactMechId);
+                postalAddress.set("address1", legacyP.getDeliveryAddress());
+                postalAddress.createOrUpdate();
+
+                EntityValue partyContactMech = ec.getEntity().makeValue("mantle.party.contact.PartyContactMech");
+                partyContactMech.set("partyId", legacyId);
+                partyContactMech.set("contactMechId", contactMechId);
+                partyContactMech.set("contactMechPurposeId", "PostalShippingDest");
+                partyContactMech.set("fromDate", Timestamp.valueOf(LocalDateTime.of(2000, 1, 1, 0, 0)));
+                partyContactMech.createOrUpdate();
             }
         }
 
