@@ -50,26 +50,28 @@ public class LegacySyncServices {
             sku.set("productId", legacyId);
             sku.set("idValue", legacyProd.getBarcode());
 
-//            final EntityValue price = ec.getEntity().makeValue("mantle.product.ProductPrice");
-//            price.set("productId", legacyId);
-//            price.set("productPriceId", "leg"+legacyId);
-//            price.set("priceTypeEnumId", "PptList");
-//            price.set("pricePurposeEnumId", "PppPurchase");
-//            price.set("priceUomId", "RON");
-//            price.set("price", legacyProd.getPricePerUom());
-//
-//            final EntityValue purchPrice = ec.getEntity().makeValue("mantle.product.ProductPrice");
-//            purchPrice.set("productId", legacyId);
-//            purchPrice.set("productPriceId", "purch"+legacyId);
-//            purchPrice.set("priceTypeEnumId", "PptAverage");
-//            purchPrice.set("pricePurposeEnumId", "PppPurchase");
-//            purchPrice.set("priceUomId", "RON");
-//            purchPrice.set("price", legacyProd.getLastBuyingPriceNoTva());
+            // final EntityValue price =
+            // ec.getEntity().makeValue("mantle.product.ProductPrice");
+            // price.set("productId", legacyId);
+            // price.set("productPriceId", "leg"+legacyId);
+            // price.set("priceTypeEnumId", "PptList");
+            // price.set("pricePurposeEnumId", "PppPurchase");
+            // price.set("priceUomId", "RON");
+            // price.set("price", legacyProd.getPricePerUom());
+            //
+            // final EntityValue purchPrice =
+            // ec.getEntity().makeValue("mantle.product.ProductPrice");
+            // purchPrice.set("productId", legacyId);
+            // purchPrice.set("productPriceId", "purch"+legacyId);
+            // purchPrice.set("priceTypeEnumId", "PptAverage");
+            // purchPrice.set("pricePurposeEnumId", "PppPurchase");
+            // purchPrice.set("priceUomId", "RON");
+            // purchPrice.set("price", legacyProd.getLastBuyingPriceNoTva());
 
             prod.createOrUpdate();
             sku.createOrUpdate();
-//            price.createOrUpdate();
-//            purchPrice.createOrUpdate();
+            // price.createOrUpdate();
+            // purchPrice.createOrUpdate();
         }
 
         return Map.of();
@@ -179,12 +181,12 @@ public class LegacySyncServices {
                 contactMech.set("contactMechId", contactMechId);
                 contactMech.set("contactMechTypeEnumId", "CmtTelecomNumber");
                 contactMech.createOrUpdate();
-                
+
                 EntityValue telecomNumber = ec.getEntity().makeValue("mantle.party.contact.TelecomNumber");
                 telecomNumber.set("contactMechId", contactMechId);
                 telecomNumber.set("contactNumber", legacyP.getPhone());
                 telecomNumber.createOrUpdate();
-                
+
                 EntityValue partyContactMech = ec.getEntity().makeValue("mantle.party.contact.PartyContactMech");
                 partyContactMech.set("partyId", legacyId);
                 partyContactMech.set("contactMechId", contactMechId);
@@ -201,7 +203,7 @@ public class LegacySyncServices {
                 contactMech.set("contactMechTypeEnumId", "CmtEmailAddress");
                 contactMech.set("infoString", legacyP.getEmail());
                 contactMech.createOrUpdate();
-                
+
                 EntityValue partyContactMech = ec.getEntity().makeValue("mantle.party.contact.PartyContactMech");
                 partyContactMech.set("partyId", legacyId);
                 partyContactMech.set("contactMechId", contactMechId);
@@ -237,8 +239,8 @@ public class LegacySyncServices {
 
                 EntityValue postalAddress = ec.getEntity().makeValue("mantle.party.contact.PostalAddress");
                 postalAddress.set("contactMechId", contactMechId);
-                postalAddress.set("countryGeoId", legacyAddr.getCountry());
-                postalAddress.set("countyGeoId", legacyAddr.getJudet());
+                postalAddress.set("countryGeoId", mapCountry(legacyAddr.getCountry()));
+                postalAddress.set("countyGeoId", mapCounty(legacyAddr.getJudet()));
                 postalAddress.set("city", legacyAddr.getOras());
                 postalAddress.set("address1", legacyAddr.getStrada());
                 postalAddress.set("postalCode", legacyAddr.getNr());
@@ -263,6 +265,7 @@ public class LegacySyncServices {
                 EntityValue postalAddress = ec.getEntity().makeValue("mantle.party.contact.PostalAddress");
                 postalAddress.set("contactMechId", contactMechId);
                 postalAddress.set("address1", legacyP.getDeliveryAddress());
+                postalAddress.set("directions", legacyP.getIndicatii());
                 postalAddress.createOrUpdate();
 
                 EntityValue partyContactMech = ec.getEntity().makeValue("mantle.party.contact.PartyContactMech");
@@ -275,6 +278,76 @@ public class LegacySyncServices {
         }
 
         return Map.of();
+    }
+
+    private static String mapCountry(String country) {
+        if (isEmpty(country))
+            return null;
+        switch (country.toUpperCase()) {
+            case "CZ":
+                return "CZE";
+            case "RO":
+                return "ROU";
+            case "HU":
+                return "HUN";
+            case "DE":
+                return "DEU";
+            case "BE":
+                return "BEL";
+            case "PL":
+                return "POL";
+            case "AU":
+                return "AUS";
+            case "IE":
+                return "IRL";
+            case "FR":
+                return "FRA";
+        }
+        return country;
+    }
+
+    private static String mapCounty(String judet) {
+        if (isEmpty(judet))
+            return null;
+        if (judet.trim().length() == 2)
+            return "RO-"+judet.trim();
+        switch (judet.toUpperCase()) {
+            case "BIHOR":
+                return "RO-BH";
+            case "ILFOV":
+                return "RO-IF";
+            case "ARGES":
+                return "RO-AG";
+            case "BUCURESTI":
+                return "RO-B";
+            case "HUNEDOARA":
+                return "RO-HD";
+            case "IASI":
+                return "RO-IS";
+            case "SALAJ":
+                return "RO-SJ";
+            case "DOLJ":
+                return "RO-DJ";
+            case "TIMIS":
+                return "RO-TM";
+            case "SATU MARE":
+                return "RO-SM";
+            case "ARAD":
+                return "RO-AR";
+            case "BACAU":
+                return "RO-BC";
+            case "ALBA":
+                return "RO-AB";
+            case "NEAMT":
+                return "RO-NT";
+            case "CONSTANTA":
+                return "RO-CT";
+            case "CLUJ":
+                return "RO-CJ";
+            case "BRASOV":
+                return "RO-BV";
+        }
+        return null;
     }
 
     public static Map<String, Object> importProductStatistics(ExecutionContext ec) {
@@ -351,15 +424,15 @@ public class LegacySyncServices {
 
                     if (supplier == null) {
                         continue;
-//                        throw new ServiceException("Organization not found: "+supplierName);
+                        // throw new ServiceException("Organization not found: "+supplierName);
                         // create supplier on demand
-//                    final EntityValue party = ec.getEntity().makeValue("Party");
-//                    party.set("partyTypeEnumId", "PtyOrganization");
-//                    party.create();
-//                    supplier = ec.getEntity().makeValue("Organization");
-//                    supplier.set("partyId", party.get("partyId"));
-//                    supplier.set("organizationName", supplierName);
-//                    supplier.create();
+                        // final EntityValue party = ec.getEntity().makeValue("Party");
+                        // party.set("partyTypeEnumId", "PtyOrganization");
+                        // party.create();
+                        // supplier = ec.getEntity().makeValue("Organization");
+                        // supplier.set("partyId", party.get("partyId"));
+                        // supplier.set("organizationName", supplierName);
+                        // supplier.create();
                     }
 
                     supplierId = (String) supplier.get("partyId");
@@ -401,7 +474,8 @@ public class LegacySyncServices {
     }
 
     public static Product productById(final Integer id) {
-        final VanzariBeanRemote commercialBean = ServiceLocator.getBusinessService(VanzariBean.class, VanzariBeanRemote.class);
+        final VanzariBeanRemote commercialBean = ServiceLocator.getBusinessService(VanzariBean.class,
+                VanzariBeanRemote.class);
         return commercialBean.productById(id);
     }
 
@@ -410,13 +484,17 @@ public class LegacySyncServices {
         return bean.convertToProducts(ops);
     }
 
-    public static InvocationResult addOperationToUnpersistedDoc(final Document.TipDoc tipDoc, final String doc, final String nrDoc, final LocalDate dataDoc, final String nrRec,
-                                                                final LocalDate dataRec, final Long partnerId, final boolean rpz, final Operatiune newOp, final Integer otherTransferGestId) {
+    public static InvocationResult addOperationToUnpersistedDoc(final Document.TipDoc tipDoc, final String doc,
+            final String nrDoc, final LocalDate dataDoc, final String nrRec,
+            final LocalDate dataRec, final Long partnerId, final boolean rpz, final Operatiune newOp,
+            final Integer otherTransferGestId) {
         final ManagerBeanRemote bean = ServiceLocator.getBusinessService(ManagerBean.class, ManagerBeanRemote.class);
-        return bean.addOperationToUnpersistedDoc(tipDoc, doc, nrDoc, dataDoc, nrRec, dataRec, partnerId, rpz, newOp, otherTransferGestId);
+        return bean.addOperationToUnpersistedDoc(tipDoc, doc, nrDoc, dataDoc, nrRec, dataRec, partnerId, rpz, newOp,
+                otherTransferGestId);
     }
 
-    public static InvocationResult addOperationToDoc(final long docId, final Operatiune op, final Integer otherTransferGestId) {
+    public static InvocationResult addOperationToDoc(final long docId, final Operatiune op,
+            final Integer otherTransferGestId) {
         final ManagerBeanRemote bean = ServiceLocator.getBusinessService(ManagerBean.class, ManagerBeanRemote.class);
         return bean.addOperationToDoc(docId, op, otherTransferGestId);
     }
@@ -434,11 +512,14 @@ public class LegacySyncServices {
     }
 
     public static ImmutableList<Document> filteredDocuments(final Integer gestiuneId,
-                                                            final Long partnerId, final Document.TipDoc tipDoc, final LocalDate from, final LocalDate to, final AccountingDocument.RPZLoad rpzLoad, final AccountingDocument.CasaLoad casaLoad,
-                                                            final AccountingDocument.BancaLoad bancaLoad, final Integer contBancarId, final AccountingDocument.DocumentTypesLoad documentTypes, final AccountingDocument.CoveredDocsLoad coveredLoad,
-                                                            final Boolean shouldTransport, final Integer userId, final AccountingDocument.ContaLoad contaLoad, final LocalDate transportFrom,
-                                                            final LocalDate transportTo)
-    {
+            final Long partnerId, final Document.TipDoc tipDoc, final LocalDate from, final LocalDate to,
+            final AccountingDocument.RPZLoad rpzLoad, final AccountingDocument.CasaLoad casaLoad,
+            final AccountingDocument.BancaLoad bancaLoad, final Integer contBancarId,
+            final AccountingDocument.DocumentTypesLoad documentTypes,
+            final AccountingDocument.CoveredDocsLoad coveredLoad,
+            final Boolean shouldTransport, final Integer userId, final AccountingDocument.ContaLoad contaLoad,
+            final LocalDate transportFrom,
+            final LocalDate transportTo) {
         final ManagerBeanRemote bean = ServiceLocator.getBusinessService(ManagerBean.class, ManagerBeanRemote.class);
         final ImmutableList<Document> docs = bean.filteredDocuments(gestiuneId, partnerId, tipDoc, from, to, rpzLoad,
                 casaLoad, bancaLoad, contBancarId, documentTypes, coveredLoad, shouldTransport, userId, contaLoad,
@@ -446,8 +527,8 @@ public class LegacySyncServices {
         return docs;
     }
 
-    public static InvocationResult regBanca(final Integer gestiuneId, final Integer contBancarId, final LocalDate from, final LocalDate to)
-    {
+    public static InvocationResult regBanca(final Integer gestiuneId, final Integer contBancarId, final LocalDate from,
+            final LocalDate to) {
         final ManagerBeanRemote bean = ServiceLocator.getBusinessService(ManagerBean.class, ManagerBeanRemote.class);
         return bean.regBanca(gestiuneId, contBancarId, from, to);
     }
