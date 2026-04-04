@@ -314,6 +314,8 @@ public class LegacySyncServices {
             return null;
         if (judet.trim().length() == 2)
             return "RO-" + judet.trim();
+        if (judet.startsWith("RO-"))
+            return judet.trim();
         switch (judet.toUpperCase()) {
             case "BIHOR":
                 return "RO-BH";
