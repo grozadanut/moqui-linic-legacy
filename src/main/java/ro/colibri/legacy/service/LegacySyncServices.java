@@ -121,6 +121,7 @@ public class LegacySyncServices {
     }
 
     public static Map<String, Object> syncPartners(ExecutionContext ec) {
+        int count = 0;
         final VanzariBeanRemote bean = ServiceLocator.getBusinessService(VanzariBean.class, VanzariBeanRemote.class);
 
         for (final Partner legacyP : bean.allPartners()) {
@@ -143,6 +144,11 @@ public class LegacySyncServices {
                 }
                 firstName = firstName.trim();
 
+                ec.getLogger().info("[syncPartners] Person #" + legacyId
+                        + " | raw='" + legacyP.getName()
+                        + "' -> lastName='" + lastName
+                        + "', firstName='" + firstName + "'");
+
                 final EntityValue pg = ec.getEntity().makeValue("Person");
                 pg.set("partyId", legacyId);
                 pg.set("firstName", firstName);
@@ -150,11 +156,15 @@ public class LegacySyncServices {
                 pg.set("nickname", legacyP.getName());
                 pg.createOrUpdate();
             } else {
+                ec.getLogger().info("[syncPartners] Organization #" + legacyId
+                        + " | name='" + legacyP.getName() + "'");
+
                 final EntityValue pg = ec.getEntity().makeValue("Organization");
                 pg.set("partyId", legacyId);
                 pg.set("organizationName", legacyP.getName());
                 pg.createOrUpdate();
             }
+            count++;
 
             // Cod Fiscal
             if (!isEmpty(legacyP.getCodFiscal())) {
@@ -280,6 +290,7 @@ public class LegacySyncServices {
             }
         }
 
+        ec.getLogger().info("[syncPartners] Done. Imported " + count + " partners.");
         return Map.of();
     }
 
