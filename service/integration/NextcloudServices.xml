@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-3.xsd">
-    <service verb="sync" noun="CustomersToNextcloud">
+    <service verb="sync" noun="CustomersToNextcloud" transaction-timeout="300">
         <in-parameters>
             <parameter name="nextcloudUrl" default-value="${System.getProperty('NEXTCLOUD_URL')}"/>
             <parameter name="username" default-value="${System.getProperty('NEXTCLOUD_USERNAME')}"/>
@@ -17,23 +17,24 @@
             
             <script><![CDATA[
                 import org.moqui.util.RestClient
+                import ro.flexbiz.util.commons.StringUtils
 
                 int count = 0
                 List<String> errors = []
-                
+
                 // Get all customers. We query by PartyRole to get unique partyIds safely.
                 def customerRoles = ec.entity.find("mantle.party.PartyRole")
-                    .condition("roleTypeId", "Customer")
-                    .list()
+                        .condition("roleTypeId", "Customer")
+                        .list()
 
                 for (def customerRole in customerRoles) {
                     String partyId = customerRole.partyId
-                    
+
                     // Fetch name using the built-in PartyDetail view
                     def partyDetail = ec.entity.find("mantle.party.PartyDetail")
-                        .condition("partyId", partyId)
-                        .one()
-                    
+                            .condition("partyId", partyId)
+                            .one()
+
                     String name = partyDetail?.organizationName ?: "${partyDetail?.firstName ?: ''} ${partyDetail?.lastName ?: ''}".trim()
                     if (!name) name = "Customer ${partyId}"
 
@@ -43,9 +44,9 @@
                             .condition("contactMechPurposeId", "PhonePrimary")
                             .orderBy("-fromDate")
                             .list()
-                        
+
                     def telecom = telecomList ? telecomList.first() : null
-                    
+
                     String phone = ""
                     if (telecom) {
                         phone = (telecom.countryCode ? '+' + telecom.countryCode + ' ' : '') +
@@ -54,8 +55,11 @@
                         phone = ro.flexbiz.util.commons.StringUtils.sanitizePhoneNumber(phone)
                     }
 
+                    if (StringUtils.isEmpty(phone))
+                        continue
+
                     // Build vCard 3.0 format simple string
-                    StringBuilder vcf = new StringBuilder()
+                        StringBuilder vcf = new StringBuilder()
                     vcf.append("BEGIN:VCARD\nVERSION:3.0\n")
                     vcf.append("FN:").append(name).append("\n")
                     if (phone) {
@@ -69,9 +73,9 @@
                     String urlStr = "${nextcloudUrl}/remote.php/dav/addressbooks/users/${username}/${addressbookName}/moqui_party_${partyId}.vcf"
 
                     RestClient restClient = ec.service.rest().method("PUT").uri(urlStr)
-                        .basicAuth(username, password)
-                        .text(vcf.toString())
-                    
+                            .basicAuth(username, password)
+                            .text(vcf.toString())
+
                     try {
                         RestClient.RestResponse restResponse = restClient.call()
                         if (restResponse.statusCode < 200 || restResponse.statusCode >= 300) {
@@ -87,15 +91,15 @@
                         errors.add(errMsg)
                     }
                 }
-                
+
                 String msg = "Successfully synced ${count} customers to Nextcloud address book '${addressbookName}'. ${errors.size()} errors."
                 ec.logger.info(msg)
-                
+
                 response = [successCount: count, errorCount: errors.size(), message: msg, errors: errors]
-            ]]></script>
+                ]]></script>
         </actions>
     </service>
-    <service verb="sync" noun="SuppliersToNextcloud">
+    <service verb="sync" noun="SuppliersToNextcloud" transaction-timeout="300">
         <in-parameters>
             <parameter name="nextcloudUrl" default-value="${System.getProperty('NEXTCLOUD_URL')}"/>
             <parameter name="username" default-value="${System.getProperty('NEXTCLOUD_USERNAME')}"/>
@@ -148,6 +152,9 @@
                                 telecom.contactNumber
                         phone = ro.flexbiz.util.commons.StringUtils.sanitizePhoneNumber(phone)
                     }
+
+                    if (StringUtils.isEmpty(phone))
+                        continue
 
                     // Build vCard 3.0 format simple string
                     StringBuilder vcf = new StringBuilder()

@@ -125,10 +125,21 @@ public class LegacySyncServices {
         final VanzariBeanRemote bean = ServiceLocator.getBusinessService(VanzariBean.class, VanzariBeanRemote.class);
 
         for (final Partner legacyP : bean.allPartners()) {
+            count++;
             boolean isPerson = isEmpty(legacyP.getCodFiscal());
+            final String legacyId = legacyP.getId() + "";
+
+            boolean skipRole = ec.getEntity().find("PartyRole")
+                    .condition("partyId", legacyId)
+                    .condition("roleTypeId", "Customer")
+                    .one() != null ||
+                    ec.getEntity().find("PartyRole")
+                            .condition("partyId", legacyId)
+                            .condition("roleTypeId", "Supplier")
+                            .one() != null;
 
             final EntityValue party = ec.getEntity().makeValue("Party");
-            final String legacyId = legacyP.getId() + "";
+
             party.set("partyId", legacyId);
             party.set("partyTypeEnumId", isPerson ? "PtyPerson" : "PtyOrganization");
             party.set("disabled", legacyP.isActiv() ? "N" : "Y");
@@ -147,7 +158,8 @@ public class LegacySyncServices {
                 ec.getLogger().info("[syncPartners] Person #" + legacyId
                         + " | raw='" + legacyP.getName()
                         + "' -> lastName='" + lastName
-                        + "', firstName='" + firstName + "'");
+                        + "', firstName='" + firstName + "'"
+                        + ", skipRole=" + skipRole);
 
                 final EntityValue pg = ec.getEntity().makeValue("Person");
                 pg.set("partyId", legacyId);
@@ -157,14 +169,13 @@ public class LegacySyncServices {
                 pg.createOrUpdate();
             } else {
                 ec.getLogger().info("[syncPartners] Organization #" + legacyId
-                        + " | name='" + legacyP.getName() + "'");
+                        + " | name='" + legacyP.getName() + "', skipRole=" + skipRole);
 
                 final EntityValue pg = ec.getEntity().makeValue("Organization");
                 pg.set("partyId", legacyId);
                 pg.set("organizationName", legacyP.getName());
                 pg.createOrUpdate();
             }
-            count++;
 
             // Cod Fiscal
             if (!isEmpty(legacyP.getCodFiscal())) {
@@ -288,10 +299,46 @@ public class LegacySyncServices {
                 partyContactMech.set("fromDate", Timestamp.valueOf(LocalDateTime.of(2000, 1, 1, 0, 0)));
                 partyContactMech.createOrUpdate();
             }
+
+            if (!skipRole) {
+                // Customer role: partner has at least one VANZARE document
+                boolean isCustomer = !filteredDocuments(
+                        null, legacyP.getId(), Document.TipDoc.VANZARE,
+                        LocalDate.of(2025, 1, 1), LocalDate.now(),
+                        AccountingDocument.RPZLoad.INDIFERENT, AccountingDocument.CasaLoad.INDIFERENT, AccountingDocument.BancaLoad.INDIFERENT,
+                        null, AccountingDocument.DocumentTypesLoad.INDIFERENT, AccountingDocument.CoveredDocsLoad.INDIFERENT,
+                        null, null, AccountingDocument.ContaLoad.INDIFERENT, null, null)
+                        .isEmpty();
+                if (isCustomer) {
+                    EntityValue customerRole = ec.getEntity().makeValue("PartyRole");
+                    customerRole.set("partyId", legacyId);
+                    customerRole.set("roleTypeId", "Customer");
+                    customerRole.createOrUpdate();
+
+                    ec.getLogger().info(legacyP.getName() + " - Added Customer role");
+                }
+
+                // Supplier role: partner has at least one CUMPARARE document with rpz = true
+                boolean isSupplier = !filteredDocuments(
+                        null, legacyP.getId(), Document.TipDoc.CUMPARARE,
+                        LocalDate.of(2025, 1, 1), LocalDate.now(), AccountingDocument.RPZLoad.DOAR_RPZ,
+                        AccountingDocument.CasaLoad.INDIFERENT, AccountingDocument.BancaLoad.INDIFERENT, null,
+                        AccountingDocument.DocumentTypesLoad.INDIFERENT, AccountingDocument.CoveredDocsLoad.INDIFERENT,
+                        null, null, AccountingDocument.ContaLoad.INDIFERENT, null, null)
+                        .isEmpty();
+                if (isSupplier) {
+                    EntityValue supplierRole = ec.getEntity().makeValue("PartyRole");
+                    supplierRole.set("partyId", legacyId);
+                    supplierRole.set("roleTypeId", "Supplier");
+                    supplierRole.createOrUpdate();
+
+                    ec.getLogger().info(legacyP.getName() + " - Added Supplier role");
+                }
+            }
         }
 
         ec.getLogger().info("[syncPartners] Done. Imported " + count + " partners.");
-        return Map.of();
+        return Map.of("result", "[syncPartners] Done. Imported " + count + " partners.");
     }
 
     private static String mapCountry(String country) {
