@@ -91,11 +91,12 @@ if (channel.channelId.equalsIgnoreCase("transfer")) {
         def auditChannel = ec.service.sync().name("mantle.party.PartyServices.get#PartySettingValue")
                 .parameters([partySettingTypeId: "SupplierOrderWhatsappAuditChannel", partyId: facilityId])
                 .call()?.settingValue
+        ec.logger.info("auditChannel: ${auditChannel}")
         if (auditChannel)
-            ec.service.sync().name("UIServices.send#WhatsappMessage")
+            ec.logger.info("auditChannel result: " + ec.service.sync().name("UIServices.send#WhatsappMessage")
                     .parameters([args: [to: auditChannel, content:
                             "Catre ${supplier.organizationName} ${channel.channelName}:\n\r${msgContent}"]])
-                    .call()
+                    .call())
     } else
         ec.message.addError("Eroare la trimiterea mesajului pe WhatsApp: "+whatsappResult.get("response"))
 }
