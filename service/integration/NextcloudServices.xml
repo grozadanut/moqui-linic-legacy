@@ -35,7 +35,7 @@
                             .condition("partyId", partyId)
                             .one()
 
-                    String name = partyDetail?.organizationName ?: "${partyDetail?.firstName ?: ''} ${partyDetail?.lastName ?: ''}".trim()
+                    String name = partyDetail?.organizationName ?: "${partyDetail?.nickname ?: ''}".trim()
                     if (!name) name = "Customer ${partyId}"
 
                     // Fetch phone number using the built-in PartyContactMechTelecomNumber view
@@ -133,7 +133,7 @@
                         .condition("partyId", partyId)
                         .one()
                     
-                    String name = partyDetail?.organizationName ?: "${partyDetail?.firstName ?: ''} ${partyDetail?.lastName ?: ''}".trim()
+                    String name = partyDetail?.organizationName ?: "${partyDetail?.nickname ?: ''}".trim()
                     if (!name) name = "Supplier ${partyId}"
 
                     // Fetch phone number using the built-in PartyContactMechTelecomNumber view
