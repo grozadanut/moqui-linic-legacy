@@ -147,6 +147,18 @@ along with this software (see the LICENSE.md file). If not, see
         </out-parameters>
     </service>
 
+    <service verb="reconcile" noun="Receipts" type="java"
+             location="ro.colibri.legacy.service.ui.Reconciler" method="reconcileReceipts">
+        <in-parameters>
+            <parameter name="gestiuneId" type="Integer"/>
+            <parameter name="date" type="LocalDate"/>
+            <parameter name="receipts"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="resultList" type="List"/>
+        </out-parameters>
+    </service>
+
     <service verb="send" noun="NotificationMessage">
         <in-parameters>
             <parameter name="type" type="org.moqui.context.NotificationMessage.NotificationType"/>

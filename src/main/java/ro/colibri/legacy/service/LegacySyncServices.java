@@ -1,6 +1,9 @@
 package ro.colibri.legacy.service;
 
+import bitronix.tm.twopc.executor.Job;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import jakarta.ejb.EJBException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.fileupload2.core.DiskFileItem;
@@ -12,6 +15,7 @@ import ro.colibri.beans.ManagerBeanRemote;
 import ro.colibri.beans.VanzariBean;
 import ro.colibri.beans.VanzariBeanRemote;
 import ro.colibri.entities.comercial.*;
+import ro.colibri.entities.user.User;
 import ro.colibri.util.InvocationResult;
 
 import java.io.BufferedReader;
@@ -588,6 +592,15 @@ public class LegacySyncServices {
                 casaLoad, bancaLoad, contBancarId, documentTypes, coveredLoad, shouldTransport, userId, contaLoad,
                 transportFrom, transportTo);
         return docs;
+    }
+
+    public static ImmutableList<Operatiune> filteredOperations(final Operatiune.TipOp tipOp,
+                       final String category, final LocalDate from, final LocalDate to, final ImmutableSet<String> docs, final String nrDoc,
+                       final Partner partner, final String barcode, final String name, final Integer gestiuneOp, final Integer gestiuneDoc,
+                       final User user, final int maxRows, final LocalDate fromRec, final LocalDate toRec) {
+        final ManagerBeanRemote bean = ServiceLocator.getBusinessService(ManagerBean.class, ManagerBeanRemote.class);
+        return bean.filteredOperations(tipOp, category, from, to, docs, nrDoc, partner,
+                barcode, name, gestiuneOp, gestiuneDoc, user, maxRows, fromRec, toRec);
     }
 
     public static InvocationResult regBanca(final Integer gestiuneId, final Integer contBancarId, final LocalDate from,

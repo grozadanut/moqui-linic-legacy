@@ -44,6 +44,9 @@ along with this software (see the LICENSE.md file). If not, see
     </resource>
     <resource name="reconcile">
         <method type="post"><service name="UIServices.reconcile#BankStatement"/></method>
+        <resource name="receipts">
+            <method type="post"><service name="UIServices.reconcile#Receipts"/></method>
+        </resource>
     </resource>
 
     <resource name="suppliers" description="Get the list of current registered suppliers">
