@@ -11,7 +11,7 @@ import java.sql.Timestamp
 ExecutionContext ec = context.ec
 Timestamp start = context.start
 Timestamp end = context.end
-var location = System.getProperty("ANAF_CONNECTOR_BASE_URL")+"/invoices/search/between"
+var location = org.moqui.util.SystemBinding.getPropOrEnv("ANAF_CONNECTOR_BASE_URL")+"/invoices/search/between"
 
 String parmsStr = RestClient.parametersMapToString([start: start.toLocalDateTime().toLocalDate(), end: end.toLocalDateTime().toLocalDate()])
 if (parmsStr != null && !parmsStr.isEmpty())

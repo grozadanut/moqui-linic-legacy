@@ -44,7 +44,7 @@ if (channel.channelId.equalsIgnoreCase("transfer")) {
             String docNr = LegacySyncServices.autoNumber(Document.TipDoc.CUMPARARE, "BON TRANSFER", null)
             InvocationResult legacyResult = LegacySyncServices.addOperationToUnpersistedDoc(
                     Document.TipDoc.CUMPARARE, "BON TRANSFER", docNr, LocalDate.now(), docNr, LocalDate.now(),
-                    NumberUtils.parseToLong(System.getProperty("OP_INTERNA_ID")),
+                    NumberUtils.parseToLong(org.moqui.util.SystemBinding.getPropOrEnv("OP_INTERNA_ID")),
                     false, op, otherGestiuneId)
             if (legacyResult.statusCanceled())
                 throw new ServiceException(legacyResult.toTextDescription())

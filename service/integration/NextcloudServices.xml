@@ -2,9 +2,9 @@
 <services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-3.xsd">
     <service verb="sync" noun="CustomersToNextcloud" transaction-timeout="300">
         <in-parameters>
-            <parameter name="nextcloudUrl" default-value="${System.getProperty('NEXTCLOUD_URL')}"/>
-            <parameter name="username" default-value="${System.getProperty('NEXTCLOUD_USERNAME')}"/>
-            <parameter name="password" default-value="${System.getProperty('NEXTCLOUD_PASSWORD')}"/>
+            <parameter name="nextcloudUrl" default-value="${org.moqui.util.SystemBinding.getPropOrEnv('NEXTCLOUD_URL')}"/>
+            <parameter name="username" default-value="${org.moqui.util.SystemBinding.getPropOrEnv('NEXTCLOUD_USERNAME')}"/>
+            <parameter name="password" default-value="${org.moqui.util.SystemBinding.getPropOrEnv('NEXTCLOUD_PASSWORD')}"/>
             <parameter name="addressbookName" default-value="clienti"/>
         </in-parameters>
         <out-parameters>
@@ -101,9 +101,9 @@
     </service>
     <service verb="sync" noun="SuppliersToNextcloud" transaction-timeout="300">
         <in-parameters>
-            <parameter name="nextcloudUrl" default-value="${System.getProperty('NEXTCLOUD_URL')}"/>
-            <parameter name="username" default-value="${System.getProperty('NEXTCLOUD_USERNAME')}"/>
-            <parameter name="password" default-value="${System.getProperty('NEXTCLOUD_PASSWORD')}"/>
+            <parameter name="nextcloudUrl" default-value="${org.moqui.util.SystemBinding.getPropOrEnv('NEXTCLOUD_URL')}"/>
+            <parameter name="username" default-value="${org.moqui.util.SystemBinding.getPropOrEnv('NEXTCLOUD_USERNAME')}"/>
+            <parameter name="password" default-value="${org.moqui.util.SystemBinding.getPropOrEnv('NEXTCLOUD_PASSWORD')}"/>
             <parameter name="addressbookName" default-value="furnizori"/>
         </in-parameters>
         <out-parameters>

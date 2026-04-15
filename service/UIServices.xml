@@ -28,7 +28,7 @@ along with this software (see the LICENSE.md file). If not, see
     </service>
 
     <service verb="scrape" noun="DuncaTileInfo" type="remote-rest"
-             method="GET" location="${System.getProperty('SCRAPE_URL')}/${URLEncoder.encode(tileName, 'UTF-8')}">
+             method="GET" location="${org.moqui.util.SystemBinding.getPropOrEnv('SCRAPE_URL')}/${URLEncoder.encode(tileName, 'UTF-8')}">
         <in-parameters>
             <parameter name="tileName" required="true"/>
         </in-parameters>
@@ -187,7 +187,7 @@ along with this software (see the LICENSE.md file). If not, see
     </service>
 
     <service verb="send" noun="WhatsappMessage" type="remote-rest"
-             method="POST" location="${System.getProperty('OWA_URL')}/sendText">
+             method="POST" location="${org.moqui.util.SystemBinding.getPropOrEnv('OWA_URL')}/sendText">
         <in-parameters>
             <parameter name="args" type="Map">
                 <parameter name="to"/>
@@ -200,7 +200,7 @@ along with this software (see the LICENSE.md file). If not, see
     </service>
 
     <service verb="send" noun="Sms" type="remote-rest"
-             method="POST" location="${System.getProperty('SMSGATE_URL')}/api/3rdparty/v1/messages">
+             method="POST" location="${org.moqui.util.SystemBinding.getPropOrEnv('SMSGATE_URL')}/api/3rdparty/v1/messages">
         <in-parameters>
             <parameter name="basicUser" required="true"/>
             <parameter name="basicPassword" required="true"/>
@@ -225,9 +225,9 @@ along with this software (see the LICENSE.md file). If not, see
         </out-parameters>
         <actions>
             <service-call name="UIServices.send#Sms" in-map="[
-                deviceId: System.getProperty('SMSGATE_DEVICE_ID'),
-                basicUser: System.getProperty('SMSGATE_USER'),
-                basicPassword: System.getProperty('SMSGATE_PASSWORD'),
+                deviceId: org.moqui.util.SystemBinding.getPropOrEnv('SMSGATE_DEVICE_ID'),
+                basicUser: org.moqui.util.SystemBinding.getPropOrEnv('SMSGATE_USER'),
+                basicPassword: org.moqui.util.SystemBinding.getPropOrEnv('SMSGATE_PASSWORD'),
                 textMessage: [text: text],
                 phoneNumbers: phoneNumbers
             ]" out-map="response"/>
