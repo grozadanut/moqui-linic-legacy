@@ -41,12 +41,12 @@ content:
           disabled: false
         row:
           - username
-          - null
+          - "{{vd.user}}"
       - attrs:
           disabled: false
         row:
           - password
-          - null
+          - "{{vd.password}}"
 ---
 ```
 ```void
