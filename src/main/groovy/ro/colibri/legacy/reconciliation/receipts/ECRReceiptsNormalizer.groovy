@@ -22,12 +22,10 @@ class ECRReceiptsNormalizer implements Normalizer {
                 location += "start"
             if (line.contains("~ ~")) {
                 location += "line"
-                continue;
+                continue
             }
             if (line.contains("SUBTOTAL"))
                 location += "SUBTOTAL"
-            if (line.contains("REDUCERE"))
-                location += "REDUCERE"
             if (line.contains("CASIER 1"))
                 location = ""
 
@@ -53,7 +51,7 @@ class ECRReceiptsNormalizer implements Normalizer {
                 }
             }
 
-            if (location.equals("startlineSUBTOTALREDUCERE")) {
+            if (line.trim().startsWith("REDUCERE")) {
                 BigDecimal discountTotal = NumberUtils.parse(line.replace("REDUCERE", "").trim())
                 records.add(new NormalizedRecord(discountTotal, GenericValue.of("total", discountTotal,
                         "name", "REDUCERE", "type", "DISC")))
