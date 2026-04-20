@@ -26,6 +26,8 @@ class ECRReceiptsNormalizer implements Normalizer {
             }
             if (line.contains("SUBTOTAL"))
                 location += "SUBTOTAL"
+            if (line.contains("REDUCERE"))
+                location += "REDUCERE"
             if (line.contains("CASIER 1"))
                 location = ""
 
@@ -51,12 +53,19 @@ class ECRReceiptsNormalizer implements Normalizer {
                 }
             }
 
+            if (location.equals("startlineSUBTOTALREDUCERE")) {
+                BigDecimal discountTotal = NumberUtils.parse(line.replace("REDUCERE", "").trim())
+                records.add(new NormalizedRecord(discountTotal, GenericValue.of("total", discountTotal,
+                        "name", "REDUCERE", "type", "DISC")))
+            }
+
             if (line.contains("TOTAL LEI")) {
                 BigDecimal receiptTotal = NumberUtils.parse(line.replace("TOTAL LEI", "").trim())
                 zTotal = NumberUtils.add(zTotal, receiptTotal)
             }
         }
-        records.add(new NormalizedRecord(o, GenericValue.of("total", zTotal, "name", "Z")))
+        records.add(new NormalizedRecord(o, GenericValue.of("total", zTotal, "name", "Z",
+                "type", "Z")))
         return records.stream()
     }
 }

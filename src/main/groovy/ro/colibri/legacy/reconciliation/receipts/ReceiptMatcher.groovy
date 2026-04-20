@@ -16,14 +16,24 @@ class ReceiptMatcher implements IdentityMatcher {
             return Stream.of()
 
         switch (index.strategy) {
+            case "type":
+                if (index.value == "Z")
+                    return Stream.of(new IdentityMatch(left, right, BigDecimal.ONE, IdentityStatus.CONFIRMED,
+                            List.of(new MatchSignal("type", BigDecimal.ONE, "Z total line"))))
+
+                if (index.value == "DISC")
+                    return Stream.of(new IdentityMatch(left, right, new BigDecimal("0.95"), IdentityStatus.PROBABLE,
+                            List.of(new MatchSignal("type", BigDecimal.ONE, "Type matches"))))
+                return Stream.of()
+            case "typeTotal":
+                if (index.value == "DISC")
+                    return Stream.of(new IdentityMatch(left, right, BigDecimal.ONE, IdentityStatus.CONFIRMED,
+                            List.of(new MatchSignal("typeTotal", BigDecimal.ONE, "Type and Total matches"))))
+                return Stream.of()
             case "nameQuantity":
                 return Stream.of(new IdentityMatch(left, right, BigDecimal.ONE, IdentityStatus.CONFIRMED,
                         List.of(new MatchSignal("nameQuantity", BigDecimal.ONE, "Name and Quantity matches"))))
             case "name":
-                if (index.value == "Z")
-                    return Stream.of(new IdentityMatch(left, right, BigDecimal.ONE, IdentityStatus.CONFIRMED,
-                            List.of(new MatchSignal("name", BigDecimal.ONE, "Z total line"))))
-
                 return Stream.of(new IdentityMatch(left, right, new BigDecimal("0.9"), IdentityStatus.PROBABLE,
                         List.of(new MatchSignal("name", BigDecimal.ONE, "Name matches"))))
         }

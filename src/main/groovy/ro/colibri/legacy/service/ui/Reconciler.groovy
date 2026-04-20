@@ -67,7 +67,10 @@ class Reconciler {
         return Map.of("resultList", ReconciliationEngine.defaults()
                 .leftNormalizer(new ECRReceiptsNormalizer())
                 .rightNormalizer(new OperatiuneNormalizer())
-                .indexer {Set.of(new Index("name", it.getFields().get("name")),
+                .indexer {Set.of(new Index("type", it.getFields().get("type")),
+                        new Index("typeTotal", it.getFields().get("type")+
+                                it.getFields().getBigDecimal("total").setScale(2, RoundingMode.HALF_EVEN).toString()),
+                        new Index("name", it.getFields().get("name")),
                         new Index("nameQuantity", it.getFields().get("name")+
                                 it.getFields().getBigDecimal("quantity")
                                         .setScale(4, RoundingMode.HALF_EVEN).toString()))}

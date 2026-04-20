@@ -15,7 +15,8 @@ class OperatiuneNormalizer implements Normalizer {
     @Override
     Stream<NormalizedRecord> normalize(Object o) {
         if (o instanceof BigDecimal)
-            return Stream.of(new NormalizedRecord(o, GenericValue.of("total", o, "name", "Z")));
+            return Stream.of(new NormalizedRecord(o, GenericValue.of("total", o, "name", "Z",
+                    "type", "Z")));
 
         Operatiune op = (Operatiune) o;
         GenericValue fields = GenericValue.of();
@@ -26,6 +27,8 @@ class OperatiuneNormalizer implements Normalizer {
         fields.put("name", op.getName());
         fields.put("uom", op.getUom());
         fields.put("pricePerUom", op.getPretVanzareUnitarCuTVA());
+        if (NumberUtils.smallerThan(op.getTotal(), BigDecimal.ZERO))
+            fields.put("type", "DISC");
         return Stream.of(new NormalizedRecord(op.getId(), fields));
     }
 }
