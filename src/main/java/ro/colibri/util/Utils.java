@@ -18,6 +18,7 @@ public class Utils {
             case "OTH_ea":
             case "H87":
             case "XPP":
+            case "C62":
                 return "BUC";
             default:
                 return uomCode;
