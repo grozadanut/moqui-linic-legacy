@@ -233,4 +233,31 @@ along with this software (see the LICENSE.md file). If not, see
             ]" out-map="response"/>
         </actions>
     </service>
+
+    <service verb="store" noun="LegacyPayment" type="java"
+             location="ro.colibri.legacy.service.ui.PartnerServices" method="storeLegacyPayment">
+        <in-parameters>
+            <parameter name="paymentId"/>
+            <parameter name="fromPartyId"/>
+            <parameter name="toPartyId"/>
+            <parameter name="amount" type="BigDecimal"/>
+            <parameter name="affiliatePartnerId"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="paymentId"/>
+        </out-parameters>
+    </service>
+    <service verb="create" noun="ColibriPartner" type="java"
+             location="ro.colibri.legacy.service.ui.PartnerServices" method="createColibriPartner">
+        <in-parameters>
+            <parameter name="partyId" required="true"/>
+            <parameter name="partnerCode" required="true"/>
+            <parameter name="isPerson" type="Boolean"/>
+            <parameter name="name" required="true"/>
+            <parameter name="phone"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+        </out-parameters>
+    </service>
 </services>

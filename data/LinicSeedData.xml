@@ -65,4 +65,29 @@
     <mantle.party.PartySettingType description="Sends all supplier whatsapp orders to this channel. Useful for auditing."
                                    partySettingTypeId="SupplierOrderWhatsappAuditChannel"/>
     <moqui.security.user.NotificationTopic topic="LegacyGeneral" description="Notifications from the legacy system"/>
+
+    <moqui.basic.Enumeration description="Affiliate ID" enumId="PtidAffiliateId" enumTypeId="PartyIdType"/>
+
+    <mantle.party.agreement.Agreement agreementId="PartenerColibri" agreementTypeEnumId="AgrCommission"
+                                      organizationPartyId="L2" organizationRoleTypeId="OrgInternal"/>
+    <mantle.party.agreement.AgreementTerm agreementTermId="PartenerColibri_1" agreementId="PartenerColibri" termTypeEnumId="TtCommission"
+                                          termNumber="50" minQuantity="500"/>
+    <mantle.party.agreement.AgreementTerm agreementTermId="PartenerColibri_2" agreementId="PartenerColibri" termTypeEnumId="TtCommission"
+                                          termNumber="150" minQuantity="5000"/>
+    <mantle.party.agreement.AgreementTerm agreementTermId="PartenerColibri_3" agreementId="PartenerColibri" termTypeEnumId="TtCommission"
+                                          termNumber="300" minQuantity="10000"/>
+    <mantle.party.agreement.AgreementTerm agreementTermId="PartenerColibri_4" agreementId="PartenerColibri" termTypeEnumId="TtCommission"
+                                          termNumber="500" minQuantity="15000"/>
+    <mantle.party.agreement.AgreementTerm agreementTermId="PartenerColibri_5" agreementId="PartenerColibri" termTypeEnumId="TtCommission"
+                                          termNumber="750" minQuantity="20000"/>
+    <mantle.party.agreement.AgreementTerm agreementTermId="PartenerColibri_6" agreementId="PartenerColibri" termTypeEnumId="TtCommission"
+                                          termNumber="1500" minQuantity="30000"/>
+    <mantle.party.agreement.AgreementTerm agreementTermId="PartenerColibri_7" agreementId="PartenerColibri" termTypeEnumId="TtCommission"
+                                          termNumber="2500" minQuantity="40000"/>
+    <mantle.party.agreement.AgreementTerm agreementTermId="PartenerColibri_8" agreementId="PartenerColibri" termTypeEnumId="TtCommission"
+                                          termNumber="3500" minQuantity="50000"/>
+    <mantle.party.agreement.AgreementTerm agreementTermId="PartenerColibri_9" agreementId="PartenerColibri" termTypeEnumId="TtCommission"
+                                          termNumber="6000" minQuantity="75000"/>
+    <mantle.party.agreement.AgreementTerm agreementTermId="PartenerColibri_10" agreementId="PartenerColibri" termTypeEnumId="TtCommission"
+                                          termNumber="10000" minQuantity="100000"/>
 </entity-facade-xml>

@@ -167,8 +167,8 @@ public class LegacySyncServices {
 
                 final EntityValue pg = ec.getEntity().makeValue("Person");
                 pg.set("partyId", legacyId);
-                pg.set("firstName", firstName);
-                pg.set("lastName", lastName);
+                pg.set("firstName", legacyP.getName());
+                pg.set("lastName", "");
                 pg.set("nickname", legacyP.getName());
                 pg.createOrUpdate();
             } else {
