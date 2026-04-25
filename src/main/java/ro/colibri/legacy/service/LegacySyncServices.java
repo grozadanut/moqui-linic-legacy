@@ -608,4 +608,9 @@ public class LegacySyncServices {
         final ManagerBeanRemote bean = ServiceLocator.getBusinessService(ManagerBean.class, ManagerBeanRemote.class);
         return bean.regBanca(gestiuneId, contBancarId, from, to);
     }
+
+    public static InvocationResult customerDebtDocs(Long partnerId) {
+        final VanzariBeanRemote bean = ServiceLocator.getBusinessService(VanzariBean.class, VanzariBeanRemote.class);
+        return bean.customerDebtDocs(partnerId);
+    }
 }

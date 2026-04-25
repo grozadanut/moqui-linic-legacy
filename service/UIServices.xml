@@ -260,4 +260,16 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="partyId"/>
         </out-parameters>
     </service>
+    <service verb="find" noun="Affiliate" type="java"
+             location="ro.colibri.legacy.service.ui.PartnerServices" method="findAffiliate">
+        <in-parameters>
+            <parameter name="searchKeyword"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="resultList" type="List"/>
+        </out-parameters>
+    </service>
+    <service verb="check" noun="PartnerAgreements" type="java"
+             location="ro.colibri.legacy.service.ui.PartnerServices" method="checkPartnerAgreements">
+    </service>
 </services>

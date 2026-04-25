@@ -77,6 +77,10 @@ along with this software (see the LICENSE.md file). If not, see
     </resource>
 
     <resource name="partners">
-        <method type="put"><service name="UIServices.create#ColibriPartner"/></method>
+        <method type="post"><service name="UIServices.create#ColibriPartner"/></method>
+        <method type="get"><service name="UIServices.find#Affiliate"/></method>
+    </resource>
+    <resource name="payment">
+        <method type="put"><service name="UIServices.store#LegacyPayment"/></method>
     </resource>
 </resource>
