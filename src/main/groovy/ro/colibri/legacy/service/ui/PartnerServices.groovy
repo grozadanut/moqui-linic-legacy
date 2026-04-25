@@ -36,7 +36,7 @@ class PartnerServices {
             paymentParty.createOrUpdate()
         }
 
-        ec.service.async().name("UIServices.check#PartnerAgreements").call()
+        // TODO: send payment received SMS to affiliate
         return [paymentId: ec.context.paymentId]
     }
 
@@ -155,117 +155,128 @@ class PartnerServices {
     }
 
     static Map<String, Object> checkPartnerAgreements(ExecutionContext ec) {
-        // 1. Resolve the affiliate party ID from context (passed via async call from storeLegacyPayment / createColibriPartner)
-//        String paymentId = ec.context.paymentId as String
-//
-//        // Determine affiliatePartyId: first check PaymentParty with role "Affiliate", fallback to Payment.fromPartyId
-//        String affiliatePartyId = null
-//        if (paymentId) {
-//            EntityValue paymentParty = ec.entity.find("mantle.account.payment.PaymentParty")
-//                    .condition("paymentId", paymentId)
-//                    .condition("roleTypeId", "Affiliate")
-//                    .one()
-//            if (paymentParty) {
-//                affiliatePartyId = paymentParty.partyId as String
-//            }
-//            if (!affiliatePartyId) {
-//                EntityValue payment = ec.entity.find("mantle.account.payment.Payment")
-//                        .condition("paymentId", paymentId)
-//                        .one()
-//                if (payment) affiliatePartyId = payment.fromPartyId as String
-//            }
-//        } else {
-//            // No paymentId in context — try direct affiliatePartyId if provided
-//            affiliatePartyId = ec.context.affiliatePartyId as String
-//        }
-//        if (!affiliatePartyId) return [:]
-//
-//        // 2. Check if this party is enrolled in the "PartenerColibri" agreement as Affiliate
-//        EntityValue agreementParty = ec.entity.find("mantle.party.agreement.AgreementParty")
-//                .condition("agreementId", "PartenerColibri")
-//                .condition("roleTypeId", "Affiliate")
-//                .condition("partyId", affiliatePartyId)
-//                .one()
-//        if (!agreementParty) return [:]
-//
-//        // 3. Find the last reached threshold: most recent FinancialAccountTrans deposit from "L2" to this affiliate
-//        //    whose finAccountTransId follows the pattern "PartenerColibri_<N>" — pick the one with the largest N
-//        EntityList depositTrans = ec.entity.find("mantle.account.financial.FinancialAccountTrans")
-//                .condition("toPartyId", affiliatePartyId)
-//                .condition("finAccountTransTypeEnumId", "FattDeposit")
-//                .condition("fromPartyId", "L2")
-//                .list()
-//
-//        EntityValue lastThresholdReached = null
-//        int lastThresholdIndex = 0
-//        for (EntityValue trans in depositTrans) {
-//            String transId = trans.finAccountTransId as String
-//            if (transId?.startsWith("PartenerColibri_")) {
-//                try {
-//                    int idx = transId.split("_")[1].toInteger()
-//                    if (idx > lastThresholdIndex) {
-//                        lastThresholdIndex = idx
-//                        lastThresholdReached = trans
-//                    }
-//                } catch (NumberFormatException ignored) { /* skip non-matching IDs */ }
-//            }
-//        }
-//
-//        // 4. Determine the next threshold AgreementTerm
-//        String nextTermId = lastThresholdReached ? "PartenerColibri_${lastThresholdIndex + 1}" : "PartenerColibri_1"
-//        EntityValue nextThreshold = ec.entity.find("mantle.party.agreement.AgreementTerm")
-//                .condition("agreementTermId", nextTermId)
-//                .one()
-//        if (!nextThreshold) return [:]
-//
-//        // 5. Calculate the total payments attributed to this affiliate
-//        //    Sum all Payment amounts where the affiliate appears via PaymentParty (role Affiliate), or as fromPartyId
-//        EntityList affiliatePaymentParties = ec.entity.find("mantle.account.payment.PaymentParty")
-//                .condition("partyId", affiliatePartyId)
-//                .condition("roleTypeId", "Affiliate")
-//                .selectField("paymentId")
-//                .list()
-//        List<String> affiliatePaymentIds = affiliatePaymentParties.collect { it.paymentId as String }
-//
-//        BigDecimal affiliatePartyPaymentsTotal = BigDecimal.ZERO
-//        if (affiliatePaymentIds) {
-//            EntityList payments = ec.entity.find("mantle.account.payment.Payment")
-//                    .condition(ec.entity.conditionFactory.makeCondition(
-//                            "paymentId", EntityCondition.IN, affiliatePaymentIds))
-//                    .selectField("amount")
-//                    .list()
-//            for (EntityValue p in payments) {
-//                if (p.amount) affiliatePartyPaymentsTotal = affiliatePartyPaymentsTotal.add(p.amount as BigDecimal)
-//            }
-//        }
-//
-//        // 6. Check threshold and guard against duplicate processing (idempotency via finAccountTransId)
-//        BigDecimal minQuantity = nextThreshold.termText ? new BigDecimal(nextThreshold.termText as String) : BigDecimal.ZERO
-//        if (affiliatePartyPaymentsTotal > minQuantity) {
-//            // Guard: only proceed if the threshold trans doesn't already exist
-//            EntityValue existingTrans = ec.entity.find("mantle.account.financial.FinancialAccountTrans")
-//                    .condition("finAccountTransId", nextTermId)
-//                    .one()
-//            if (!existingTrans) {
-//                BigDecimal lastTermNumber = lastThresholdReached ? (lastThresholdReached.termNumber as BigDecimal ?: BigDecimal.ZERO) : BigDecimal.ZERO
-//                BigDecimal bonusAmount = (nextThreshold.termNumber as BigDecimal) - lastTermNumber
-//
-//                // Create the FinancialAccountTrans milestone deposit
-//                EntityValue fat = ec.entity.makeValue("mantle.account.financial.FinancialAccountTrans")
-//                fat.set("finAccountTransId", nextTermId)
-//                fat.set("finAccountTransTypeEnumId", "FattDeposit")
-//                fat.set("finAccountId", affiliatePartyId)   // partner's FinancialAccount has finAccountId = partyId
-//                fat.set("fromPartyId", "L2")
-//                fat.set("toPartyId", affiliatePartyId)
-//                fat.set("transactionDate", ec.user.nowTimestamp)
-//                fat.set("entryDate", ec.user.nowTimestamp)
-//                fat.set("amount", bonusAmount)
-//                fat.create()
-//
-//                // TODO: create legacy DiscountDoc incasare
-//                // TODO: send threshold reached SMS to affiliate
-//            }
-//        }
+        String paymentId = ec.context.paymentId as String
+        def ecf = ec.entity.conditionFactory
+
+        // 1. Find the affiliatePartyId associated with this payment, if any
+        // affiliatePartyId = PaymentParty.partyId WHERE PaymentParty.roleTypeId = "Affiliate"
+        // if null affiliatePartyId = Payment.fromPartyId
+        String affiliatePartyId = null
+        EntityValue paymentAffiliate = ec.entity.find("mantle.account.payment.PaymentParty")
+                .condition("paymentId", paymentId)
+                .condition("roleTypeId", "Affiliate")
+                .one()
+        if (paymentAffiliate) {
+            affiliatePartyId = paymentAffiliate.partyId as String
+        }
+        if (!affiliatePartyId) {
+            EntityValue payment = ec.entity.find("mantle.account.payment.Payment")
+                    .condition("paymentId", paymentId)
+                    .one()
+            if (payment) affiliatePartyId = payment.fromPartyId as String
+        }
+        if (!affiliatePartyId) return [:]
+
+        // 2. Check if this party is enrolled in the "PartenerColibri" agreement as Affiliate
+        // agreementParty = AgreementParty WHERE agreementId = "PartenerColibri" AND roleTypeId = "Affiliate" AND partyId = affiliatePartyId
+        // if agreementParty is null then EXIT
+        EntityValue agreementParty = ec.entity.find("mantle.party.agreement.AgreementParty")
+                .condition("agreementId", "PartenerColibri")
+                .condition("roleTypeId", "Affiliate")
+                .condition("partyId", affiliatePartyId)
+                .one()
+        if (!agreementParty) return [:]
+
+        // 3. Find the last reached threshold: most recent FinancialAccountTrans deposit from "L2" to this affiliate
+        //    whose finAccountTransId follows the pattern "PC${affiliatePartyId}_<N>" — pick the one with the largest N
+        // lastThresholdReached = FinancialAccountTrans WHERE toPartyId = affiliatePartyId AND finAccountTransTypeEnumId = "FattDeposit" AND fromPartyId = "L2" AND finAccountId = affiliatePartyId
+        // ORDER BY finAccountTransId.split("_")[1].toInt GET LARGEST
+        EntityList depositTrans = ec.entity.find("mantle.account.financial.FinancialAccountTrans")
+                .condition("finAccountId", affiliatePartyId)
+                .condition("fromPartyId", "L2")
+                .condition("toPartyId", affiliatePartyId)
+                .condition("finAccountTransTypeEnumId", "FattDeposit")
+                .list()
+
+        EntityValue lastThresholdReached = null
+        int lastThresholdIndex = 0
+        for (EntityValue trans in depositTrans) {
+            String transId = trans.finAccountTransId as String
+            if (transId?.startsWith("PC${affiliatePartyId}_")) {
+                try {
+                    int idx = transId.split("_")[1].toInteger()
+                    if (idx > lastThresholdIndex) {
+                        lastThresholdIndex = idx
+                        lastThresholdReached = trans
+                    }
+                } catch (NumberFormatException ex) {
+                    /* skip non-matching IDs */
+                    ec.logger.trace(ex.getMessage(), ex)
+                }
+            }
+        }
+
+        // 4. Determine the next threshold AgreementTerm
+        // nextThreshold = AgreementTerm WHERE agreementTermId = "PartenerColibri_${lastThresholdIndex + 1}" ?: "PartenerColibri_1"
+        // if nextThreshold is null then EXIT
+        String nextTermId = lastThresholdReached ? "PartenerColibri_${lastThresholdIndex + 1}" : "PartenerColibri_1"
+        EntityValue nextThreshold = ec.entity.find("mantle.party.agreement.AgreementTerm")
+                .condition("agreementTermId", nextTermId)
+                .one()
+        if (!nextThreshold) return [:]
+
+        // 5. Calculate the total payments attributed to this affiliate
+        //    Sum all Payment amounts where the affiliate appears via PaymentParty (role Affiliate), or as fromPartyId
+        EntityFind ef = ec.entity.find("linic.legacy.payment.PaymentSummary").distinct(true)
+        ef.selectFields(["amountTotal"])
+        ef.condition("statusId", "PmntDelivered")
+        ef.condition("toPartyId", "L2")
+        ef.condition(ecf.makeCondition([
+                ecf.makeCondition([partyId: affiliatePartyId, roleTypeId: "Affiliate"]),
+                ecf.makeCondition("fromPartyId", EntityCondition.EQUALS, affiliatePartyId)],
+                EntityCondition.JoinOperator.OR))
+
+        BigDecimal affiliatePartyPaymentsTotal = ef.list().stream()
+                .map {it.getBigDecimal("amountTotal")}
+                .reduce(BigDecimal::add)
+                .orElse(BigDecimal.ZERO)
+
+        // 6. Check threshold and guard against duplicate processing (idempotency via finAccountTransId)
+        // if affiliatePartyPaymentsTotal > nextThreshold.minQuantity AND NOT EXISTS FinancialAccountTrans WHERE finAccountTransId = "PC${affiliatePartyId}_${lastThresholdIndex + 1}"
+        if (affiliatePartyPaymentsTotal > nextThreshold.getBigDecimal("minQuantity")) {
+            // Guard: only proceed if the threshold trans doesn't already exist
+            String nextTransId = "PC${affiliatePartyId}_${lastThresholdIndex + 1}"
+            EntityValue existingTrans = ec.entity.find("mantle.account.financial.FinancialAccountTrans")
+                    .condition("finAccountTransId", nextTransId)
+                    .one()
+            if (!existingTrans) {
+                // create FinancialAccountTrans
+                //   finAccountTransId = "PC${partner.id}_${lastThresholdIndex + 1}"
+                //   finAccountTransTypeEnumId = "FattDeposit"
+                //   finAccountId = partner.id
+                //   fromPartyId = "L2"
+                //   toPartyId = affiliatePartyId
+                //   transactionDate = now
+                //   amount = nextThreshold.termNumber - (lastThresholdReached.amount ?: 0)
+                BigDecimal lastBonusDeposit = lastThresholdReached ? (lastThresholdReached.amount as BigDecimal ?: BigDecimal.ZERO) : BigDecimal.ZERO
+                BigDecimal bonusAmount = nextThreshold.getBigDecimal("termNumber") - lastBonusDeposit
+
+                // Create the FinancialAccountTrans milestone deposit
+                EntityValue fat = ec.entity.makeValue("mantle.account.financial.FinancialAccountTrans")
+                fat.set("finAccountTransId", nextTransId)
+                fat.set("finAccountTransTypeEnumId", "FattDeposit")
+                fat.set("finAccountId", affiliatePartyId)   // partner's FinancialAccount has finAccountId = partyId
+                fat.set("fromPartyId", "L2")
+                fat.set("toPartyId", affiliatePartyId)
+                fat.set("transactionDate", ec.user.nowTimestamp)
+                fat.set("entryDate", ec.user.nowTimestamp)
+                fat.set("amount", bonusAmount)
+                fat.create()
+
+                // TODO: create legacy DiscountDoc incasare
+                // TODO: send threshold reached SMS to affiliate
+            }
+        }
 
         return [:]
     }
