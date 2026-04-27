@@ -217,8 +217,8 @@ along with this software (see the LICENSE.md file). If not, see
 
     <service verb="send" noun="ColibriSms">
         <in-parameters>
-            <parameter name="text" required="true"/>
             <parameter name="phoneNumbers" type="List" required="true"/>
+            <parameter name="text" required="true"/>
         </in-parameters>
         <out-parameters>
             <parameter name="response" type="Map"/>
@@ -237,10 +237,10 @@ along with this software (see the LICENSE.md file). If not, see
     <service verb="store" noun="LegacyPayment" type="java"
              location="ro.colibri.legacy.service.ui.PartnerServices" method="storeLegacyPayment">
         <in-parameters>
-            <parameter name="paymentId"/>
-            <parameter name="fromPartyId"/>
-            <parameter name="toPartyId"/>
-            <parameter name="amount" type="BigDecimal"/>
+            <parameter name="paymentId" required="true"/>
+            <parameter name="fromPartyId" required="true"/>
+            <parameter name="toPartyId" required="true"/>
+            <parameter name="amount" type="BigDecimal" required="true"/>
             <parameter name="affiliatePartnerId"/>
         </in-parameters>
         <out-parameters>

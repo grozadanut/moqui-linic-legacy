@@ -21,6 +21,7 @@ import ro.colibri.util.InvocationResult;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.time.LocalDate;
@@ -612,5 +613,11 @@ public class LegacySyncServices {
     public static InvocationResult customerDebtDocs(Long partnerId) {
         final VanzariBeanRemote bean = ServiceLocator.getBusinessService(VanzariBean.class, VanzariBeanRemote.class);
         return bean.customerDebtDocs(partnerId);
+    }
+
+    public static InvocationResult createDiscountDoc(Long partnerId, String name, BigDecimal total,
+                                                     BigDecimal discPercetange) {
+        final VanzariBeanRemote bean = ServiceLocator.getBusinessService(VanzariBean.class, VanzariBeanRemote.class);
+        return bean.createDiscountDoc(partnerId, name, total, discPercetange);
     }
 }
