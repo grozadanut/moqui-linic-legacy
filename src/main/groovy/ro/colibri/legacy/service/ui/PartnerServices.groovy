@@ -134,7 +134,7 @@ class PartnerServices {
         if (StringUtils.notEmpty(searchKeyword))
             ef.condition(ecf.makeCondition([
                     ecf.makeCondition([partyIdTypeEnumId: "PtidAffiliateId", idValue: searchKeyword.toUpperCase()]),
-                    ecf.makeCondition([ecf.makeCondition("contactMechPurposeId","PhonePrimary"),
+                    ecf.makeCondition([ecf.makeCondition([phoneContactMechPurposeId: "PhonePrimary"]),
                                        ecf.makeConditionDate("phoneFromDate", "phoneThruDate", ec.user.nowTimestamp),
                                        ecf.makeCondition("contactNumber", org.moqui.entity.EntityCondition.LIKE, "%${searchKeyword}")])],
                     EntityCondition.JoinOperator.OR))
@@ -248,19 +248,27 @@ class PartnerServices {
                 .one()
         if (!nextThreshold) return [:]
 
+        EntityValue lastReachedTerm = null
+        if (lastThresholdIndex > 0) {
+            String lastTermId = "PartenerColibri_${lastThresholdIndex}"
+            lastReachedTerm = ec.entity.find("mantle.party.agreement.AgreementTerm")
+                    .condition("agreementTermId", lastTermId)
+                    .one()
+        }
+
         // 5. Calculate the total payments attributed to this affiliate
         BigDecimal affiliatePartyPaymentsTotal = affiliatePartyPaymentsTotal(ec, affiliatePartyId)
 
         EntityFind ef = ec.entity.find("mantle.party.FindAffiliateView").distinct(true)
         ef.selectFields(["contactNumber", "phoneAllowSolicitation"])
         ef.condition("partyId", affiliatePartyId)
-        ef.condition("contactMechPurposeId", "PhonePrimary")
+        ef.condition("phoneContactMechPurposeId", "PhonePrimary")
         ef.conditionDate("phoneFromDate", "phoneThruDate", ec.user.nowTimestamp)
         EntityValue phone = ef.list().getFirst()
 
         // 6. Check threshold and guard against duplicate processing (idempotency via finAccountTransId)
         // if affiliatePartyPaymentsTotal > nextThreshold.minQuantity AND NOT EXISTS FinancialAccountTrans WHERE finAccountTransId = "PC${affiliatePartyId}_${lastThresholdIndex + 1}"
-        if (affiliatePartyPaymentsTotal > nextThreshold.getBigDecimal("minQuantity")) {
+        if (affiliatePartyPaymentsTotal >= nextThreshold.getBigDecimal("minQuantity")) {
             // Guard: only proceed if the threshold trans doesn't already exist
             String nextTransId = "PC${affiliatePartyId}_${nextThresholdIndex}"
             EntityValue existingTrans = ec.entity.find("mantle.account.financial.FinancialAccountTrans")
@@ -274,21 +282,22 @@ class PartnerServices {
                 //   fromPartyId = "L2"
                 //   toPartyId = affiliatePartyId
                 //   transactionDate = now
-                //   amount = nextThreshold.termNumber - (lastThresholdReached.amount ?: 0)
-                BigDecimal lastBonusDeposit = lastThresholdReached ? (lastThresholdReached.amount as BigDecimal ?: BigDecimal.ZERO) : BigDecimal.ZERO
-                BigDecimal bonusAmount = nextThreshold.getBigDecimal("termNumber") - lastBonusDeposit
+                //   amount = nextThreshold.termNumber - (lastReachedTerm.termNumber ?: 0)
+                BigDecimal bonusAmount = NumberUtils.subtract(nextThreshold.getBigDecimal("termNumber"),
+                        lastReachedTerm?.getBigDecimal("termNumber"))
 
                 // Create the FinancialAccountTrans milestone deposit
-                EntityValue fat = ec.entity.makeValue("mantle.account.financial.FinancialAccountTrans")
-                fat.set("finAccountTransId", nextTransId)
-                fat.set("finAccountTransTypeEnumId", "FattDeposit")
-                fat.set("finAccountId", affiliatePartyId)   // partner's FinancialAccount has finAccountId = partyId
-                fat.set("fromPartyId", "L2")
-                fat.set("toPartyId", affiliatePartyId)
-                fat.set("transactionDate", ec.user.nowTimestamp)
-                fat.set("entryDate", ec.user.nowTimestamp)
-                fat.set("amount", bonusAmount)
-                fat.create()
+                ec.service.sync().name("create#mantle.account.financial.FinancialAccountTrans")
+                        .parameter("finAccountTransId", nextTransId)
+                        .parameter("finAccountTransTypeEnumId", "FattDeposit")
+                        .parameter("reasonEnumId", "FatrCsCredit")
+                        .parameter("finAccountId", affiliatePartyId)   // partner's FinancialAccount has finAccountId = partyId
+                        .parameter("fromPartyId", "L2")
+                        .parameter("toPartyId", affiliatePartyId)
+                        .parameter("transactionDate", ec.user.nowTimestamp)
+                        .parameter("entryDate", ec.user.nowTimestamp)
+                        .parameter("amount", bonusAmount)
+                        .disableAuthz().call()
 
                 // create legacy DiscountDoc incasare
                 LegacySyncServices.createDiscountDoc(Long.valueOf(affiliatePartyId),
@@ -311,7 +320,7 @@ class PartnerServices {
 
     private static void sendThresholdReachedSms(ExecutionContext ec, String affiliatePartyId, EntityValue phone,
                                                 BigDecimal nextThresholdQuantity, BigDecimal nextThresholdTerm) {
-        if (!phone || !phone.phoneAllowSolicitation) return
+        if (!phone || (phone.phoneAllowSolicitation != null && !phone.phoneAllowSolicitation)) return
 
         InvocationResult result = LegacySyncServices.customerDebtDocs(Long.valueOf(affiliatePartyId))
         ImmutableList<RulajPartener> unpaidPartners = result.extra(InvocationResult.PARTNER_RULAJ_KEY)
@@ -325,7 +334,7 @@ class PartnerServices {
                 .orElseGet {accDocs.stream().findFirst().map {it.rulajPartener.discDisponibil}.orElse(BigDecimal.ZERO)}
 
         StringBuilder sb = new StringBuilder()
-        sb.append("Felicitări! Tocmai ai trecut peste pragul de ${PresentationUtils.displayBigDecimal(nextThresholdQuantity)} lei plătiți și ai deblocat suma de ${PresentationUtils.displayBigDecimal(nextThresholdTerm)} lei pe care îi poți folosi la orice achiziție viitoare.").append(NEWLINE)
+        sb.append("Felicitări! Tocmai ai trecut peste pragul de ${PresentationUtils.displayBigDecimal(nextThresholdQuantity)} lei plătiți și ai deblocat suma de ${PresentationUtils.displayBigDecimal(nextThresholdTerm)} lei.").append(NEWLINE)
         if (NumberUtils.greaterThan(discAcum, BigDecimal.ZERO))
             sb.append("Discount acumulat: ${PresentationUtils.displayBigDecimal(discAcum)} lei.").append(NEWLINE)
         if (NumberUtils.greaterThan(discChelt, BigDecimal.ZERO))
@@ -337,12 +346,13 @@ class PartnerServices {
         List phoneNumbers = [StringUtils.sanitizePhoneNumber(phone.contactNumber), "+40754476519"]
         ec.service.sync().name("UIServices.send#ColibriSms")
                 .parameters([phoneNumbers: phoneNumbers, text: sb.toString()])
+                .disableAuthz()
                 .call()
     }
 
     private static void sendPaymentReceivedSms(ExecutionContext ec, String affiliatePartyId, EntityValue phone,
                                                BigDecimal affiliatePartyPaymentsTotal, BigDecimal amount, BigDecimal nextThresholdQuantity) {
-        if (!phone || !phone.phoneAllowSolicitation) return
+        if (!phone || (phone.phoneAllowSolicitation != null && !phone.phoneAllowSolicitation)) return
 
         InvocationResult result = LegacySyncServices.customerDebtDocs(Long.valueOf(affiliatePartyId))
         ImmutableList<RulajPartener> unpaidPartners = result.extra(InvocationResult.PARTNER_RULAJ_KEY)
@@ -371,6 +381,7 @@ class PartnerServices {
         List phoneNumbers = [StringUtils.sanitizePhoneNumber(phone.contactNumber), "+40754476519"]
         ec.service.sync().name("UIServices.send#ColibriSms")
                 .parameters([phoneNumbers: phoneNumbers, text: sb.toString()])
+                .disableAuthz()
                 .call()
     }
 }

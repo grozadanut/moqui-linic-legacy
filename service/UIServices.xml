@@ -269,7 +269,7 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="resultList" type="List"/>
         </out-parameters>
     </service>
-    <service verb="check" noun="PartnerAgreements" type="java"
+    <service verb="check" noun="PartnerAgreements" type="java" authenticate="anonymous-view"
              location="ro.colibri.legacy.service.ui.PartnerServices" method="checkPartnerAgreements">
         <in-parameters>
             <parameter name="paymentId" required="true"/>
