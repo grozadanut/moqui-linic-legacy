@@ -1,5 +1,8 @@
 package ro.colibri.legacy.service.ui
 
+import java.sql.Timestamp
+import java.time.LocalDateTime
+
 import static ro.flexbiz.util.commons.PresentationUtils.NEWLINE
 import com.google.common.collect.ImmutableList
 import jakarta.persistence.PreUpdate
@@ -85,7 +88,7 @@ class PartnerServices {
             partyContactMech.set("partyId", partyId)
             partyContactMech.set("contactMechId", contactMechId)
             partyContactMech.set("contactMechPurposeId", "PhonePrimary")
-            partyContactMech.set("fromDate", ec.user.nowTimestamp)
+            partyContactMech.set("fromDate", Timestamp.valueOf(LocalDateTime.of(2000, 1, 1, 0, 0)))
             partyContactMech.createOrUpdate()
         }
 
@@ -139,8 +142,19 @@ class PartnerServices {
                                        ecf.makeCondition("contactNumber", org.moqui.entity.EntityCondition.LIKE, "%${searchKeyword}")])],
                     EntityCondition.JoinOperator.OR))
 
-        List<Map<String, Object>> resultList = []
+        // Deduplicate by partyId: a party with both a PostalAddress and a TelecomNumber produces
+        // multiple rows from the view. We prefer the row that carries a contactNumber so that the
+        // phone is always surfaced in the result.
+        Map<String, EntityValue> partyMap = new LinkedHashMap<>()
         for (EntityValue party in ef.list()) {
+            String pid = party.partyId as String
+            EntityValue existing = partyMap.get(pid)
+            if (existing == null || (existing.contactNumber == null && party.contactNumber != null))
+                partyMap.put(pid, party)
+        }
+
+        List<Map<String, Object>> resultList = []
+        for (EntityValue party in partyMap.values()) {
             InvocationResult result = StringUtils.notEmpty(searchKeyword) ?
                     LegacySyncServices.customerDebtDocs(NumberUtils.parseToLong(party.partyId)) :
                     InvocationResult.ok()

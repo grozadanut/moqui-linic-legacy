@@ -192,7 +192,7 @@ public class LegacySyncServices {
             }
 
             // Reg Com
-            if (!isEmpty(legacyP.getRegCom())) {
+            if (!isEmpty(legacyP.getRegCom()) && !legacyP.getRegCom().equalsIgnoreCase("J05/")) {
                 EntityValue partyIdentification = ec.getEntity().makeValue("mantle.party.PartyIdentification");
                 partyIdentification.set("partyId", legacyId);
                 partyIdentification.set("partyIdTypeEnumId", "PtidTradeReg");
