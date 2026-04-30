@@ -26,6 +26,9 @@ class PartnerServices {
                 .one() != null)
             return [:]
 
+        // create Party on demand
+        ec.getEntity().makeValue("Party").set("partyId", ec.context.fromPartyId).createOrUpdate()
+
         EntityValue payment = ec.entity.makeValue("mantle.account.payment.Payment")
         payment.set("paymentId", ec.context.paymentId)
         payment.set("paymentTypeEnumId", "PtInvoicePayment")
@@ -37,6 +40,9 @@ class PartnerServices {
         payment.create()
 
         if (StringUtils.notEmpty(ec.context.affiliatePartnerId)) {
+            // create Party on demand
+            ec.getEntity().makeValue("Party").set("partyId", ec.context.affiliatePartnerId).createOrUpdate()
+
             EntityValue paymentParty = ec.entity.makeValue("mantle.account.payment.PaymentParty")
             paymentParty.set("paymentId", ec.context.paymentId)
             paymentParty.set("partyId", ec.context.affiliatePartnerId)
