@@ -139,7 +139,7 @@ class PartnerServices {
                     ecf.makeCondition([partyIdTypeEnumId: "PtidAffiliateId", idValue: searchKeyword.toUpperCase()]),
                     ecf.makeCondition([ecf.makeCondition([phoneContactMechPurposeId: "PhonePrimary"]),
                                        ecf.makeConditionDate("phoneFromDate", "phoneThruDate", ec.user.nowTimestamp),
-                                       ecf.makeCondition("contactNumber", org.moqui.entity.EntityCondition.LIKE, "%${searchKeyword}")])],
+                                       ecf.makeCondition("contactNumber", EntityCondition.LIKE, "%${searchKeyword}")])],
                     EntityCondition.JoinOperator.OR))
 
         // Deduplicate by partyId: a party with both a PostalAddress and a TelecomNumber produces
@@ -158,8 +158,8 @@ class PartnerServices {
             InvocationResult result = StringUtils.notEmpty(searchKeyword) ?
                     LegacySyncServices.customerDebtDocs(NumberUtils.parseToLong(party.partyId)) :
                     InvocationResult.ok()
-            ImmutableList<RulajPartener> unpaidPartners = result.extra(InvocationResult.PARTNER_RULAJ_KEY);
-            ImmutableList<AccountingDocument> accDocs = result.extra(InvocationResult.ACCT_DOC_KEY);
+            ImmutableList<RulajPartener> unpaidPartners = result.extra(InvocationResult.PARTNER_RULAJ_KEY)
+            ImmutableList<AccountingDocument> accDocs = result.extra(InvocationResult.ACCT_DOC_KEY)
 
             resultList.add([
                     partyId: party.partyId,
@@ -194,7 +194,6 @@ class PartnerServices {
 
     static Map<String, Object> checkPartnerAgreements(ExecutionContext ec) {
         String paymentId = ec.context.paymentId as String
-        def ecf = ec.entity.conditionFactory
 
         // 1. Find the affiliatePartyId associated with this payment, if any
         // affiliatePartyId = PaymentParty.partyId WHERE PaymentParty.roleTypeId = "Affiliate"
@@ -348,14 +347,14 @@ class PartnerServices {
                 .orElseGet {accDocs.stream().findFirst().map {it.rulajPartener.discDisponibil}.orElse(BigDecimal.ZERO)}
 
         StringBuilder sb = new StringBuilder()
-        sb.append("Felicitări! Tocmai ai trecut peste pragul de ${PresentationUtils.displayBigDecimal(nextThresholdQuantity)} lei plătiți și ai deblocat suma de ${PresentationUtils.displayBigDecimal(nextThresholdTerm)} lei.").append(NEWLINE)
+        sb.append("Felicitari! Tocmai ai trecut peste pragul de ${PresentationUtils.displayBigDecimal(nextThresholdQuantity)} lei platiti si ai deblocat suma de ${PresentationUtils.displayBigDecimal(nextThresholdTerm)} lei.").append(NEWLINE)
         if (NumberUtils.greaterThan(discAcum, BigDecimal.ZERO))
             sb.append("Discount acumulat: ${PresentationUtils.displayBigDecimal(discAcum)} lei.").append(NEWLINE)
         if (NumberUtils.greaterThan(discChelt, BigDecimal.ZERO))
             sb.append("Discount cheltuit: ${PresentationUtils.displayBigDecimal(discChelt)} lei.").append(NEWLINE)
         if (NumberUtils.greaterThan(discDisponibil, BigDecimal.ZERO))
             sb.append("Discount disponibil: ${PresentationUtils.displayBigDecimal(discDisponibil)} lei.").append(NEWLINE)
-        sb.append("Mulțumim pentru colaborare! Showroom Colibri")
+        sb.append("Multumim pentru colaborare! Showroom Colibri")
 
         List phoneNumbers = [StringUtils.sanitizePhoneNumber(phone.contactNumber), "+40754476519"]
         ec.service.sync().name("UIServices.send#ColibriSms")
@@ -380,17 +379,17 @@ class PartnerServices {
                 .orElseGet {accDocs.stream().findFirst().map {it.rulajPartener.discDisponibil}.orElse(BigDecimal.ZERO)}
 
         StringBuilder sb = new StringBuilder()
-        sb.append("Salut! Am primit plata ta în valoare de ${PresentationUtils.displayBigDecimal(amount)} lei.").append(NEWLINE)
-                .append("Suma totală plătită până acum: ${PresentationUtils.displayBigDecimal(affiliatePartyPaymentsTotal)} lei.").append(NEWLINE)
+        sb.append("Salut! Am primit plata ta in valoare de ${PresentationUtils.displayBigDecimal(amount)} lei.").append(NEWLINE)
+                .append("Suma totala platita pana acum: ${PresentationUtils.displayBigDecimal(affiliatePartyPaymentsTotal)} lei.").append(NEWLINE)
         if (nextThresholdQuantity)
-            sb.append("Până la următorul prag de ${PresentationUtils.displayBigDecimal(nextThresholdQuantity)}, mai ai de acumulat: ${PresentationUtils.displayBigDecimal(nextThresholdQuantity-affiliatePartyPaymentsTotal)} lei.").append(NEWLINE)
+            sb.append("Pana la urmatorul prag de ${PresentationUtils.displayBigDecimal(nextThresholdQuantity)}, mai ai de acumulat: ${PresentationUtils.displayBigDecimal(nextThresholdQuantity-affiliatePartyPaymentsTotal)} lei.").append(NEWLINE)
         if (NumberUtils.greaterThan(discAcum, BigDecimal.ZERO))
             sb.append("Discount acumulat: ${PresentationUtils.displayBigDecimal(discAcum)} lei.").append(NEWLINE)
         if (NumberUtils.greaterThan(discChelt, BigDecimal.ZERO))
             sb.append("Discount cheltuit: ${PresentationUtils.displayBigDecimal(discChelt)} lei.").append(NEWLINE)
         if (NumberUtils.greaterThan(discDisponibil, BigDecimal.ZERO))
             sb.append("Discount disponibil: ${PresentationUtils.displayBigDecimal(discDisponibil)} lei.").append(NEWLINE)
-        sb.append("Mulțumim pentru colaborare! Showroom Colibri")
+        sb.append("Multumim pentru colaborare! Showroom Colibri")
 
         List phoneNumbers = [StringUtils.sanitizePhoneNumber(phone.contactNumber), "+40754476519"]
         ec.service.sync().name("UIServices.send#ColibriSms")
