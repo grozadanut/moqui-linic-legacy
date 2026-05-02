@@ -59,6 +59,16 @@ class PartnerServices {
         Boolean isPerson = ec.context.isPerson as Boolean
         String phone = ec.context.phone as String
 
+        // don't allow duplicate partner codes
+        EntityFind ef = ec.entity.find("mantle.party.PartyIdentification")
+        ef.selectFields(["partyId"])
+        ef.condition("partyIdTypeEnumId", "PtidAffiliateId")
+        ef.condition("idValue", partnerCode.toUpperCase())
+        if (ef.count() > 0) {
+            ec.getMessage().addError("Codul de partener ${partnerCode.toUpperCase()} este deja folosit!")
+            return null
+        }
+
         // Party
         final EntityValue party = ec.getEntity().makeValue("Party")
         party.set("partyId", partyId)
