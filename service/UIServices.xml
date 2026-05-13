@@ -187,12 +187,13 @@ along with this software (see the LICENSE.md file). If not, see
     </service>
 
     <service verb="send" noun="WhatsappMessage" type="remote-rest"
-             method="POST" location="${org.moqui.util.SystemBinding.getPropOrEnv('OWA_URL')}/sendText">
+             method="POST" location="${org.moqui.util.SystemBinding.getPropOrEnv('WHATSAPP_URL')}/send/message">
         <in-parameters>
-            <parameter name="args" type="Map">
-                <parameter name="to"/>
-                <parameter name="content"/>
-            </parameter>
+            <parameter name="httpHeaders" type="Map"/>
+            <parameter name="basicUser" default-value="${org.moqui.util.SystemBinding.getPropOrEnv('WHATSAPP_USER')}"/>
+            <parameter name="basicPassword" default-value="${org.moqui.util.SystemBinding.getPropOrEnv('WHATSAPP_PASSWORD')}"/>
+            <parameter name="phone" required="true"/>
+            <parameter name="message" required="true"/>
         </in-parameters>
         <out-parameters>
             <parameter name="response" type="Map"/>

@@ -15,7 +15,7 @@ resultList = []
 resultList.add([channelId: "print", channelName: "Printeaza"])
 for (tel in ef.list()) {
     resultList.add([channelId: "whatsapp", channelName: "WhatsApp ${tel.askForName ?: ''}",
-                    chatId: tel.contactNumber+"@lid"])
+                    chatId: tel.contactNumber+"@s.whatsapp.net"])
 }
 
 if (ec.entity.find("mantle.party.PartyRole")

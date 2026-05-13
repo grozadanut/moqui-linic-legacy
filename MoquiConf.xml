@@ -5,7 +5,17 @@
     <default-property name="SCRAPE_URL" value="http://dunca-scraper:8080/scrape"/>
     <default-property name="OP_INTERNA_ID" value="1170"/>
     <default-property name="java.naming.provider.url" value="http-remoting://localhost:8080"/>
-    <default-property name="OWA_URL" value="http://owa:8002"/>
+    <default-property name="WHATSAPP_URL" value="http://whatsapp:3000"/>
+    <default-property name="WHATSAPP_USER" value="admin"/>
+    <default-property name="WHATSAPP_PASSWORD" value="admin"/>
+    <default-property name="WHATSAPP_DEVICE_ID" value=""/>
+    <default-property name="SMSGATE_URL" value="http://smsgate:3000"/>
+    <default-property name="SMSGATE_DEVICE_ID" value=""/>
+    <default-property name="SMSGATE_USER" value=""/>
+    <default-property name="SMSGATE_PASSWORD" value=""/>
+    <default-property name="NEXTCLOUD_URL" value="https://cloud.example.com"/>
+    <default-property name="NEXTCLOUD_USERNAME" value=""/>
+    <default-property name="NEXTCLOUD_PASSWORD" value=""/>
 
     <screen-facade>
         <screen location="component://webroot/screen/webroot/apps.xml">

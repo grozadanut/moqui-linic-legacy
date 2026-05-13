@@ -3,6 +3,7 @@ package ro.colibri.legacy.service.ui
 import com.google.common.collect.ImmutableList
 import org.moqui.context.ExecutionContext
 import org.moqui.service.ServiceException
+import org.moqui.util.SystemBinding
 import ro.colibri.entities.comercial.AccountingDocument
 import ro.colibri.entities.comercial.Document
 import ro.colibri.entities.comercial.Gestiune
@@ -44,7 +45,7 @@ if (channel.channelId.equalsIgnoreCase("transfer")) {
             String docNr = LegacySyncServices.autoNumber(Document.TipDoc.CUMPARARE, "BON TRANSFER", null)
             InvocationResult legacyResult = LegacySyncServices.addOperationToUnpersistedDoc(
                     Document.TipDoc.CUMPARARE, "BON TRANSFER", docNr, LocalDate.now(), docNr, LocalDate.now(),
-                    NumberUtils.parseToLong(org.moqui.util.SystemBinding.getPropOrEnv("OP_INTERNA_ID")),
+                    NumberUtils.parseToLong(SystemBinding.getPropOrEnv("OP_INTERNA_ID")),
                     false, op, otherGestiuneId)
             if (legacyResult.statusCanceled())
                 throw new ServiceException(legacyResult.toTextDescription())
@@ -75,9 +76,10 @@ if (channel.channelId.equalsIgnoreCase("transfer")) {
             .toList()
             .join(System.lineSeparator())
     var whatsappResult = ec.service.sync().name("UIServices.send#WhatsappMessage")
-            .parameters([args: [to: channel.chatId, content: msgContent]])
+            .parameters([phone: channel.chatId, message: msgContent,
+                         httpHeaders: ["X-Device-Id": SystemBinding.getPropOrEnv('WHATSAPP_DEVICE_ID')]])
             .call()
-    if (whatsappResult.get("success")) {
+    if (whatsappResult.get("code") == "SUCCESS") {
         requirements.forEach {req ->
             ec.service.sync().name("UIServices.statusTo#Requirement")
                     .parameters([facilityId: facilityId])
@@ -94,9 +96,12 @@ if (channel.channelId.equalsIgnoreCase("transfer")) {
         ec.logger.info("auditChannel: ${auditChannel}")
         if (auditChannel)
             ec.logger.info("auditChannel result: " + ec.service.sync().name("UIServices.send#WhatsappMessage")
-                    .parameters([args: [to: auditChannel, content:
-                            "Catre ${supplier.organizationName} ${channel.channelName}:\n\r${msgContent}"]])
+                    .parameters([httpHeaders: ["X-Device-Id": SystemBinding.getPropOrEnv('WHATSAPP_DEVICE_ID')],
+                                 phone: auditChannel, message:
+                            "Catre ${supplier.organizationName} ${channel.channelName}:\n\n${msgContent}"])
                     .call())
-    } else
-        ec.message.addError("Eroare la trimiterea mesajului pe WhatsApp: "+whatsappResult.get("response"))
+    } else {
+        ec.logger.error(whatsappResult?.toString())
+        ec.message.addError("Eroare la trimiterea mesajului pe WhatsApp: "+whatsappResult.get("code"))
+    }
 }
