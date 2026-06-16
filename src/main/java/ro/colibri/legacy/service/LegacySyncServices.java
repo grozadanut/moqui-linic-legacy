@@ -620,4 +620,17 @@ public class LegacySyncServices {
         final VanzariBeanRemote bean = ServiceLocator.getBusinessService(VanzariBean.class, VanzariBeanRemote.class);
         return bean.createDiscountDoc(partnerId, name, total, discPercetange);
     }
+
+    public static AccountingDocument findById(final Long accDocId) {
+        if (accDocId == null)
+            return null;
+
+        final VanzariBeanRemote bean = ServiceLocator.getBusinessService(VanzariBean.class, VanzariBeanRemote.class);
+        return bean.accountingDocumentById(accDocId, true);
+    }
+
+    public static ImmutableList<PersistedProp> allPersistedProps_NO_CACHE() {
+        final ManagerBeanRemote bean = ServiceLocator.getBusinessService(ManagerBean.class, ManagerBeanRemote.class);
+        return bean.allPersistedProps();
+    }
 }

@@ -12,7 +12,7 @@ import java.util.Properties;
 import static ro.colibri.util.ServerConstants.EAR_VERSION;
 
 public class ServiceLocator {
-    private static final Map<String, RemoteService> SERVICES_CACHE;
+    public static final Map<String, RemoteService> SERVICES_CACHE;
 
     // The app name is the application name of the deployed EJBs. This is typically
     // the ear name
