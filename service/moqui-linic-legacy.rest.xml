@@ -61,6 +61,10 @@ along with this software (see the LICENSE.md file). If not, see
         <resource name="receive" description="Mark ANAF eFactura invoice as received">
             <method type="post"><service name="AnafServices.receive#AnafInvoice"/></method>
         </resource>
+
+        <resource name="v2">
+            <method type="get"><service name="AnafServices.find#AnafInvoicesV2"/></method>
+        </resource>
     </resource>
     <resource name="anafInvoiceLines" description="Get Invoice lines from an ANAF eFactura invoice">
         <method type="get"><service name="AnafServices.find#AnafInvoiceLines"/></method>
