@@ -24,8 +24,8 @@ along with this software (see the LICENSE.md file). If not, see
             </parameter>
         </out-parameters>
     </service>
-    <service verb="find" noun="AnafInvoicesV2" type="script"
-             location="classpath://ro/colibri/legacy/service/findAnafInvoicesV2.groovy">
+    <service verb="find" noun="AnafInvoicesV2" type="java"
+             location="ro.flexbiz.anaf.service.LegacyAnafServices" method="findAnafInvoicesV2">
         <in-parameters>
             <parameter name="start" type="Timestamp" required="true"/>
             <parameter name="end" type="Timestamp" required="true"/>

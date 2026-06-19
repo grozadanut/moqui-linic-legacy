@@ -16,7 +16,7 @@ msg.set("senderId", rootNode.first("cac:AccountingSupplierParty").first("cac:Par
         .first("cac:PartyTaxScheme").first("cbc:CompanyID").text)
 msg.set("receiverId", rootNode.first("cac:AccountingCustomerParty").first("cac:Party")
         .first("cac:PartyTaxScheme").first("cbc:CompanyID").text)
-msg.set("docControl", rootNode.first("cac:LegalMonetaryTotal").first("cbc:TaxInclusiveAmount").text)
+msg.set("docControl", rootNode.first("cac:LegalMonetaryTotal").first("cbc:TaxInclusiveAmount")?.text)
 
 if (docType.equalsIgnoreCase("Invoice")) {
     msg.set("docSubType", rootNode.first("cbc:InvoiceTypeCode").text)
