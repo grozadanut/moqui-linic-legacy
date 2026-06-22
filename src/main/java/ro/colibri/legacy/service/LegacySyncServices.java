@@ -541,6 +541,54 @@ public class LegacySyncServices {
         return Map.of();
     }
 
+    public static Map<String, Object> importReportedInvoice(ExecutionContext ec) {
+        final DiskFileItem fileBytes = (DiskFileItem) ec.getContext().get("uploadedFile");
+        final CSVFormat.Builder csvFormatBuilder = CSVFormat.Builder.create();
+        final CSVFormat fmt = csvFormatBuilder.build();
+        int count = 0;
+
+        try (BufferedReader csvReader = new BufferedReader(new InputStreamReader(fileBytes.getInputStream()))) {
+            for (final CSVRecord rec : fmt.parse(csvReader)) {
+                count++;
+                final String invoiceId = rec.get(0);
+                final String state = rec.get(1);
+                String uploadIndex = rec.get(2);
+                String downloadId = rec.get(3);
+                String errorMessage = rec.get(4);
+                uploadIndex = uploadIndex.equals("NULL") ? null : uploadIndex;
+                downloadId = downloadId.equals("NULL") ? null : downloadId;
+                errorMessage = errorMessage.equals("NULL") ? null : errorMessage;
+
+                String statusId = switch (state) {
+                    case "UPLOAD_ERROR" -> "AnafRepInvUploadError";
+                    case "WAITING_VALIDATION" -> "AnafRepInvWaitingValidation";
+                    case "REJECTED_INVALID" -> "AnafRepInvRejectedInvalid";
+                    case "SENT" -> "AnafRepInvSent";
+                    default -> null;
+                };
+
+                final EntityValue e = ec.getEntity().makeValue("ro.flexbiz.efactura.ReportedInvoice");
+                e.set("invoiceId", invoiceId);
+                e.set("statusId", statusId);
+                e.set("uploadIndex", uploadIndex);
+                e.set("downloadId", downloadId);
+                e.set("errorMessage", errorMessage);
+                e.createOrUpdate();
+            }
+        } catch (final IOException e) {
+            throw new ServiceException("Error at importReportedInvoice", e);
+        }
+
+        ec.getLogger().info("Imported and updated " + count + " reported invoices.");
+
+        try {
+            fileBytes.delete();
+        } catch (IOException e) {
+            ec.getLogger().error(e.getMessage(), e);
+        }
+        return Map.of();
+    }
+
     public static Product productById(final Integer id) {
         final VanzariBeanRemote commercialBean = ServiceLocator.getBusinessService(VanzariBean.class,
                 VanzariBeanRemote.class);

@@ -52,6 +52,13 @@ along with this software (see the LICENSE.md file). If not, see
         </in-parameters>
     </service>
 
+    <service verb="legacyImport" noun="ReportedInvoice" type="java" transaction="force-new" transaction-timeout="3600"
+             location="ro.colibri.legacy.service.LegacySyncServices" method="importReportedInvoice">
+        <in-parameters>
+            <parameter name="uploadedFile" type="org.apache.commons.fileupload2.core.DiskFileItem" required="true"/>
+        </in-parameters>
+    </service>
+
     <service verb="find" noun="ProductSuppliers" type="script"
              location="classpath://ro/colibri/legacy/service/findProductSuppliers.groovy">
         <in-parameters>
