@@ -4,9 +4,11 @@ import org.moqui.context.ExecutionContext
 import org.moqui.entity.EntityCondition
 import org.moqui.entity.EntityDynamicView
 import org.moqui.entity.EntityFind
+import org.moqui.entity.EntityList
 import org.moqui.util.MNode
 
 import java.sql.Timestamp
+import java.util.stream.Collectors
 
 class LegacyAnafServices {
     static Map<String, Object> findAnafInvoicesV2(ExecutionContext ec) {
@@ -57,7 +59,9 @@ class LegacyAnafServices {
         ef.condition("systemMessageTypeId", "ANAFReceivedInvoice")
         ef.condition("issueDate", EntityCondition.BETWEEN, [start, end])
 
-        for (msg in ef.list()) {
+        EntityList receivedInvoices = ef.list()
+
+        for (msg in receivedInvoices) {
             MNode rootNode = MNode.parseText(null, msg.messageText)
             var invoiceTotal = rootNode.first("cac:LegalMonetaryTotal").first("cbc:TaxInclusiveAmount")?.text ?:
                     rootNode.first("cac:LegalMonetaryTotal").first("cbc:PayableAmount")?.text
@@ -73,6 +77,15 @@ class LegacyAnafServices {
                             "taxTotal": taxTotal, "taxExclusiveAmount": taxExclusiveAmount, "senderName": senderName,
                             "rawXml": msg.messageText])
         }
+
+        List<String> receivedInvoicesIds = receivedInvoices.stream().map { it.id }.collect(Collectors.toList())
+        for (msg in ec.entity.find("ro.flexbiz.efactura.ReceivedMessage")
+                .condition("creationDate", EntityCondition.ComparisonOperator.BETWEEN, [start, end])
+                .condition("id", EntityCondition.ComparisonOperator.NOT_IN, receivedInvoicesIds)
+                .list())
+            resultList.add(["id": msg.id, "senderId": msg.taxId, "issueDate": msg.creationDate,
+                            "messageType": ec.l10n.localize(msg.statusId), "details": msg.details])
+
         return [resultList: resultList]
     }
 }
