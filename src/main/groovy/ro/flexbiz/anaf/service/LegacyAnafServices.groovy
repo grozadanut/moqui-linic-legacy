@@ -75,7 +75,8 @@ class LegacyAnafServices {
             resultList.add(["id": msg.id, "senderId": msg.senderId, "issueDate": msg.issueDate, "invoiceNumber": msg.invoiceNumber,
                             "invoiceId": msg.invoiceId, "statusId": msg.statusId, "invoiceTotal": invoiceTotal,
                             "taxTotal": taxTotal, "taxExclusiveAmount": taxExclusiveAmount, "senderName": senderName,
-                            "rawXml": msg.messageText])
+                            "rawXml": msg.messageText, messageType: "AnafRecMsgBillReceived",
+                            "messageTypeL10n": ec.l10n.localize("AnafRecMsgBillReceived")])
         }
 
         List<String> receivedInvoicesIds = receivedInvoices.stream().map { it.id }.collect(Collectors.toList())
@@ -85,7 +86,8 @@ class LegacyAnafServices {
                 .condition("statusId", EntityCondition.ComparisonOperator.NOT_IN, ["AnafRecMsgBillReceived", "AnafRecMsgBillSent"])
                 .list())
             resultList.add(["id": msg.id, "senderId": msg.taxId, "issueDate": msg.creationDate,
-                            "messageType": ec.l10n.localize(msg.statusId), "details": msg.details])
+                            messageType: msg.statusId, "messageTypeL10n": ec.l10n.localize(msg.statusId),
+                            "details": msg.details])
 
         return [resultList: resultList]
     }
