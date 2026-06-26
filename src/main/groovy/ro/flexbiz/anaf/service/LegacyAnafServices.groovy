@@ -82,6 +82,7 @@ class LegacyAnafServices {
         for (msg in ec.entity.find("ro.flexbiz.efactura.ReceivedMessage")
                 .condition("creationDate", EntityCondition.ComparisonOperator.BETWEEN, [start, end])
                 .condition("id", EntityCondition.ComparisonOperator.NOT_IN, receivedInvoicesIds)
+                .condition("statusId", EntityCondition.ComparisonOperator.NOT_IN, ["AnafRecMsgBillReceived", "AnafRecMsgBillSent"])
                 .list())
             resultList.add(["id": msg.id, "senderId": msg.taxId, "issueDate": msg.creationDate,
                             "messageType": ec.l10n.localize(msg.statusId), "details": msg.details])
