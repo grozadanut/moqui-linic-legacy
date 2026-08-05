@@ -13,9 +13,13 @@ final String docType = rootNode.nodeName
 EntityValue msg = ec.getEntity().makeValue("moqui.service.message.SystemMessage")
 msg.set("messageId", rootNode.first("cbc:ID").text)
 msg.set("senderId", rootNode.first("cac:AccountingSupplierParty").first("cac:Party")
-        .first("cac:PartyTaxScheme").first("cbc:CompanyID").text)
+        .first("cac:PartyTaxScheme")?.first("cbc:CompanyID")?.text ?:
+        rootNode.first("cac:AccountingSupplierParty").first("cac:Party")
+                .first("cac:PartyLegalEntity")?.first("cbc:CompanyID")?.text)
 msg.set("receiverId", rootNode.first("cac:AccountingCustomerParty").first("cac:Party")
-        .first("cac:PartyTaxScheme").first("cbc:CompanyID").text)
+        .first("cac:PartyTaxScheme")?.first("cbc:CompanyID")?.text ?:
+        rootNode.first("cac:AccountingCustomerParty").first("cac:Party")
+                .first("cac:PartyLegalEntity")?.first("cbc:CompanyID")?.text)
 msg.set("docControl", rootNode.first("cac:LegalMonetaryTotal").first("cbc:TaxInclusiveAmount")?.text)
 
 if (docType.equalsIgnoreCase("Invoice")) {
