@@ -12,6 +12,7 @@ import ro.flexbiz.billing.pojo.InvoiceLine;
 import ro.flexbiz.billing.pojo.TaxCategory;
 import ro.flexbiz.billing.pojo.TaxSubtotal;
 import ro.flexbiz.util.commons.LocalDateUtils;
+import ro.flexbiz.util.commons.NumberUtils;
 import ro.flexbiz.util.commons.PresentationUtils;
 
 import java.math.BigDecimal;
@@ -66,7 +67,7 @@ public interface InvoiceMapper {
                             .reduce(BigDecimal::add)
                             .orElse(BigDecimal.ZERO));
                     final TaxCategory taxCategory = new TaxCategory();
-                    taxCategory.setCode("S");
+                    taxCategory.setCode( NumberUtils.equal(vatToOps.getKey(), BigDecimal.ZERO) ? "Z" : "S" );
                     taxCategory.setPercent(vatToOps.getKey());
                     taxCategory.setTaxScheme("VAT");
                     taxSubtotal.setTaxCategory(taxCategory);
