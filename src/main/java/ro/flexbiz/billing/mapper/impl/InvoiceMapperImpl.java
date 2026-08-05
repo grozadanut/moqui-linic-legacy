@@ -97,15 +97,11 @@ public class InvoiceMapperImpl implements InvoiceMapper {
 
         BigDecimal vatRate = OperatiuneUtil.getVanzareTvaPercentCalculated(op);
 
-        if (NumberUtils.equal(vatRate, BigDecimal.ZERO)) {
-            return null;
-        }
-
         TaxCategory taxCategory = new TaxCategory();
 
         taxCategory.setPercent( vatRate );
 
-        taxCategory.setCode( "S" );
+        taxCategory.setCode( NumberUtils.equal(vatRate, BigDecimal.ZERO) ? "Z" : "S" );
         taxCategory.setTaxScheme( "VAT" );
 
         return taxCategory;
