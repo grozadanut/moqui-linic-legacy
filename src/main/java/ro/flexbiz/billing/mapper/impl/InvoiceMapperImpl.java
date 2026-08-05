@@ -15,6 +15,7 @@ import ro.colibri.entities.user.User;
 import ro.flexbiz.billing.dto.InvoiceOldDto;
 import ro.flexbiz.billing.mapper.InvoiceMapper;
 import ro.flexbiz.billing.pojo.*;
+import ro.flexbiz.util.commons.NumberUtils;
 
 //@Generated(
 //        value = "org.mapstruct.ap.MappingProcessor",
@@ -94,9 +95,15 @@ public class InvoiceMapperImpl implements InvoiceMapper {
             return null;
         }
 
+        BigDecimal vatRate = OperatiuneUtil.getVanzareTvaPercentCalculated(op);
+
+        if (NumberUtils.equal(vatRate, BigDecimal.ZERO)) {
+            return null;
+        }
+
         TaxCategory taxCategory = new TaxCategory();
 
-        taxCategory.setPercent( OperatiuneUtil.getVanzareTvaPercentCalculated(op) );
+        taxCategory.setPercent( vatRate );
 
         taxCategory.setCode( "S" );
         taxCategory.setTaxScheme( "VAT" );
