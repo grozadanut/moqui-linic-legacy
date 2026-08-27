@@ -72,7 +72,7 @@ if (channel.channelId.equalsIgnoreCase("transfer")) {
     }
 } else if (channel.channelId.equalsIgnoreCase("whatsapp")) {
     var msgContent = requirements.stream()
-            .map { MessageFormat.format("{0} \t {1} {2}", it.name, it.quantityTotal, it.uom)}
+            .map { MessageFormat.format("{0} {1}  X  {2}", it.quantityTotal, it.uom, it.name)}
             .toList()
             .join(System.lineSeparator())
     var whatsappResult = ec.service.sync().name("UIServices.send#WhatsappMessage")
