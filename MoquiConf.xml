@@ -17,6 +17,10 @@
     <default-property name="NEXTCLOUD_USERNAME" value=""/>
     <default-property name="NEXTCLOUD_PASSWORD" value=""/>
 
+    <tools>
+        <tool-factory class="ro.flexbiz.NatsToolFactory"/>
+    </tools>
+
     <screen-facade>
         <screen location="component://webroot/screen/webroot/apps.xml">
             <subscreens-item name="moqui_linic_legacy" menu-title="Linic Legacy" menu-index="97" location="component://moqui-linic-legacy/screen/App.xml"/>

@@ -1,6 +1,9 @@
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
         default-menu-title="Dashboard" default-menu-index="1">
 
+    <transition name="pushBarcode"><service-call name="UIServices.push#BarcodeToPC"/>
+        <default-response url="."/></transition>
+
     <actions>
         <if condition="lookupId">
             <set field="facilityId" from="facilityId ?: ec.user.getPreference('FacilityActive') ?: ec.user.getPreference('FacilityGeneralDefault')"/>
@@ -30,8 +33,9 @@
             </form-single>
         </row-col></container-row>
 
-        <form-list name="ProductList" list="productList" skip-form="true">
+        <form-list name="ProductList" list="productList" transition="pushBarcode" focus-field="quantity">
             <row-actions>
+                <set field="quantity" value="1"/>
                 <entity-find entity-name="mantle.product.ProductIdentification" list="prodIdentList">
                     <econdition field-name="productId"/><order-by field-name="productIdTypeEnumId"/></entity-find>
             </row-actions>
@@ -63,12 +67,19 @@
                 <header-field title="Stoc L2" show-order-by="true"/>
                 <default-field><display also-hidden="false"/></default-field>
             </field>
+            <field name="quantity">
+                <header-field title="Cant"/>
+                <default-field><text-line size="4"/></default-field>
+            </field>
+            <field name="submit"><default-field title=" "><submit text=" " icon="fa fa-paper-plane"/></default-field></field>
 
             <form-list-column><field-ref name="pseudoId"/><field-ref name="prodIdents"/></form-list-column>
             <form-list-column><field-ref name="productName"/></form-list-column>
             <form-list-column><field-ref name="priceNicename"/></form-list-column>
             <form-list-column><field-ref name="stockL1"/></form-list-column>
             <form-list-column><field-ref name="stockL2"/></form-list-column>
+            <form-list-column><field-ref name="quantity"/></form-list-column>
+            <form-list-column><field-ref name="submit"/></form-list-column>
         </form-list>
 
         <form-list name="ScrapedList" list="scrapedList" skip-form="true">
