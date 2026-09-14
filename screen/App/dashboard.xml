@@ -46,7 +46,7 @@
             </row-actions>
             <field name="pseudoId">
                 <header-field title="ID" show-order-by="case-insensitive"/>
-                <default-field><display also-hidden="false"/></default-field>
+                <default-field><display/></default-field>
             </field>
             <field name="prodIdents"><default-field title="Other IDs">
                 <section-iterate name="OtherProductIdSection" list="prodIdentList" entry="prodIdent"><widgets>
