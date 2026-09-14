@@ -2,6 +2,7 @@ package ro.flexbiz
 
 import groovy.transform.CompileStatic
 import io.nats.client.Connection
+import io.nats.client.Message
 import io.nats.client.Nats
 import io.nats.client.Options
 import org.moqui.context.ExecutionContextFactory
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory
 import ro.flexbiz.util.commons.StringUtils
 
 import java.nio.charset.StandardCharsets
+import java.time.Duration
 
 @CompileStatic
 class NatsToolFactory implements ToolFactory<NatsToolFactory> {
@@ -73,6 +75,18 @@ class NatsToolFactory implements ToolFactory<NatsToolFactory> {
             nc.publish(tenantId+"."+subject, body == null ? null : body.getBytes(StandardCharsets.UTF_8))
         } catch (final Exception e) {
             logger.error(e.getMessage(), e)
+        }
+    }
+
+    Optional<Message> requestReply(final String tenantId, final String subject, final String body, final Duration timeout) {
+        if (nc == null)
+            return Optional.empty()
+
+        try {
+            return Optional.ofNullable(nc.request(tenantId+"."+subject, body == null ? null : body.getBytes(StandardCharsets.UTF_8), timeout))
+        } catch (final Exception e) {
+            logger.error(e.getMessage(), e)
+            return Optional.empty()
         }
     }
 }
